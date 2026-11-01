@@ -97,25 +97,18 @@ export const FreelanceHook: React.FC<{ data: BangTinData }> = ({ data }) => {
           Dành cho sinh viên
         </div>
       </div>
-      <div style={{ position: "absolute", top: 540, left: 0, right: 0, textAlign: "center" }}>
-        <div style={{ fontSize: 400, fontWeight: 900, letterSpacing: -20, lineHeight: 1, textShadow: "0 30px 80px rgba(0,0,0,.35)", scale: String(0.85 + 0.15 * punch) }}>{Math.round(total * num)}</div>
-        <div style={{ fontSize: 92, fontWeight: 900, letterSpacing: -2, marginTop: -10, opacity: ease(frame, 30, 42, [0, 1]) }}>
-          VIỆC LÀM <span style={{ color: C.orange }}>THÊM</span>
+      <div style={{ position: "absolute", top: 520, left: 0, right: 0, textAlign: "center" }}>
+        <div style={{ fontSize: 380, fontWeight: 900, letterSpacing: -20, lineHeight: 1, textShadow: "0 30px 80px rgba(0,0,0,.35)", scale: String(0.85 + 0.15 * punch) }}>{Math.round(total * num)}</div>
+        <div style={{ fontSize: (fl.label ?? "VIỆC LÀM THÊM").length > 16 ? 72 : 92, fontWeight: 900, letterSpacing: -2, marginTop: -10, opacity: ease(frame, 30, 42, [0, 1]) }}>
+          {fl.label ?? "VIỆC LÀM THÊM"}
         </div>
-        <div style={{ fontSize: 46, fontWeight: 800, marginTop: 6, opacity: ease(frame, 36, 48, [0, 0.95]) }}>Thực tập • Part-time • Freelancer</div>
+        {fl.place && <div style={{ fontSize: 80, fontWeight: 900, color: C.orange, marginTop: 4, opacity: ease(frame, 34, 46, [0, 1]) }}>{fl.place.toUpperCase()}</div>}
+        <div style={{ fontSize: 42, fontWeight: 800, marginTop: 6, opacity: ease(frame, 40, 52, [0, 0.95]) }}>Thực tập • Part-time • Cộng tác viên</div>
       </div>
-      <div style={{ position: "absolute", top: 1250, left: 0, right: 0, display: "flex", justifyContent: "center", scale: String(pill) }}>
+      <div style={{ position: "absolute", top: fl.place ? 1360 : 1250, left: 0, right: 0, display: "flex", justifyContent: "center", scale: String(pill) }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18, background: `linear-gradient(90deg, ${C.orange}, ${C.orange2})`, borderRadius: 999, padding: "24px 44px", fontSize: 48, fontWeight: 900, boxShadow: "0 20px 60px rgba(255,127,20,.55)" }}>
           <Ico name="briefcase" size={54} />+ {allJobs(data).length} việc làm toàn thời gian
         </div>
-      </div>
-      <div style={{ position: "absolute", top: 1420, left: 60, right: 60, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 16 }}>
-        {data.regionsLine.map((r, i) => (
-          <div key={r} style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,.14)", border: "2px solid rgba(255,255,255,.25)", borderRadius: 999, padding: "12px 26px", fontSize: 34, fontWeight: 700, opacity: ease(frame, 66 + i * 5, 78 + i * 5, [0, 1]) }}>
-            <Ico name="pin" size={34} color={C.orange} />
-            {r}
-          </div>
-        ))}
       </div>
     </AbsoluteFill>
   );
@@ -125,12 +118,13 @@ export const FreelanceHook: React.FC<{ data: BangTinData }> = ({ data }) => {
 export const FreelanceOverview: React.FC<{ fl: FL }> = ({ fl }) => {
   const frame = useCurrentFrame();
   const stats = (fl.stats ?? []).slice(0, 4);
+  const top = fl.name.length > 18 ? 560 : 450;
   return (
     <AbsoluteFill style={{ fontFamily: FONT, color: "#fff" }}>
       <BrandBackground />
       <TopBar />
       <Title kicker={fl.sub} title={fl.name} color={PURPLE} />
-      <div style={{ position: "absolute", top: 450, left: 60, right: 60, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+      <div style={{ position: "absolute", top, left: 60, right: 60, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
         {stats.map((s, i) => {
           const d = 12 + i * 8;
           const p = ease(frame, d, d + 24, [0, 1]);
@@ -147,7 +141,7 @@ export const FreelanceOverview: React.FC<{ fl: FL }> = ({ fl }) => {
         })}
       </div>
       {fl.payNote && (
-        <div style={{ position: "absolute", top: 1240, left: 60, right: 60, display: "flex", alignItems: "center", gap: 22, background: "rgba(255,255,255,.14)", border: "2px solid rgba(255,255,255,.28)", borderRadius: 28, padding: "22px 28px", opacity: ease(frame, 50, 62, [0, 1]) }}>
+        <div style={{ position: "absolute", top: top + 790, left: 60, right: 60, display: "flex", alignItems: "center", gap: 22, background: "rgba(255,255,255,.14)", border: "2px solid rgba(255,255,255,.28)", borderRadius: 28, padding: "22px 28px", opacity: ease(frame, 50, 62, [0, 1]) }}>
           <Ico name="wallet" size={60} color={C.orange2} />
           <div style={{ fontSize: 36, fontWeight: 800, lineHeight: 1.25 }}>{fl.payNote}</div>
         </div>

@@ -19,6 +19,11 @@ export type BangTinData = {
     sub: string;
     jobs?: Job[];
     total?: number;
+    // Nơi làm việc của cả mục (vd. "Cần Thơ"): hiện ở cảnh mở đầu và đọc "việc làm thêm tại ..."
+    place?: string;
+    // Chữ lớn ở cảnh mở đầu (mặc định "VIỆC LÀM THÊM") và cách gọi trong lời đọc (vd. "việc làm bán thời gian tại Cần Thơ")
+    label?: string;
+    say?: string;
     stats?: { value: string; label: string; icon: string }[];
     payNote?: string;
     groups?: FreelanceGroup[];

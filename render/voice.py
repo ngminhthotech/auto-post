@@ -240,7 +240,8 @@ def freelance_lines(d):
     groups = fl["groups"]
     lines = []
     counts = [f"{count_word(g.get('total') or len(g['jobs']))} {g.get('say') or g['name'].lower()}" for g in groups]
-    s = "Việc làm thêm hôm nay có " + ", ".join(counts[:-1]) + (", và " if len(counts) > 1 else "") + counts[-1] + "."
+    what = fl.get("say") or ("việc làm thêm" + (f" tại {fl['place']}" if fl.get("place") else ""))
+    s = f"{what[:1].upper() + what[1:]} hôm nay có " + ", ".join(counts[:-1]) + (", và " if len(counts) > 1 else "") + counts[-1] + "."
     if fl.get("payNote"):
         s += " " + fl["payNote"].rstrip(".") + "."
     lines.append(fit([s], "", limit=280))
@@ -285,7 +286,8 @@ def script(d):
              f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, ")
     if focus:
         n = fl.get("total") or sum(g.get("total") or len(g["jobs"]) for g in fl["groups"])
-        lines.append(intro + f"bản tin dành riêng cho sinh viên và freelancer, với {n} việc làm thêm, cùng {total} việc làm toàn thời gian!")
+        what = fl.get("say") or ("việc làm thêm" + (f" tại {fl['place']}" if fl.get("place") else ""))
+        lines.append(intro + f"bản tin dành cho sinh viên, với {n} {what}, cùng {total} việc làm toàn thời gian!")
     elif fl.get("jobs"):
         # Có mục Freelancer: bỏ câu lương (đã hiện trên hình) để câu mở đầu vẫn dưới 300 ký tự (giới hạn của Vbee)
         lines.append(intro + f"chúng tôi cập nhật bản tin việc làm, gồm có {total} vị trí, và {count_word(len(fl['jobs'][:6]))} việc làm thêm cho sinh viên!")
