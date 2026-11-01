@@ -32,16 +32,15 @@ type Scene = { key: string; dur: number; el: (dur: number) => React.ReactNode; s
 // Thứ tự cảnh (có thêm cảnh Freelancer sau các khu vực nếu JSON có "freelance") phải khớp với thứ tự lời đọc trong render/voice.py (script_pro)
 export const proScenes = (d: BangTinData): Scene[] => {
   const fl = d.freelance;
-  // Bản tin tập trung sinh viên (freelance.groups): mục việc làm thêm lên đầu và chi tiết nhất,
-  // việc làm toàn thời gian rút gọn (bỏ cảnh nhà tuyển dụng, ngành nghề, sắp hết hạn).
+  // Bản tin tập trung sinh viên (freelance.groups): đi đúng một mạch Cần Thơ (việc làm thêm chi tiết theo nhóm,
+  // rồi việc toàn thời gian Cần Thơ), Đồng bằng sông Cửu Long, TP.HCM; bỏ các cảnh trộn nhiều khu vực
+  // (nhà tuyển dụng, ngành nghề, top lương, sắp hết hạn).
   const focus = !!fl?.groups?.length;
   const s: Scene[] = focus
     ? [
         { key: "hook", dur: 110, el: () => <FreelanceHook data={d} /> },
         { key: "fl-overview", dur: 150, el: () => <FreelanceOverview fl={fl!} /> },
         ...fl!.groups!.map((g, i) => ({ key: `fl-${i}`, dur: 200, el: () => <FreelanceScene kicker={g.sub} title={g.name} jobs={g.jobs} color={g.color} /> })),
-        ...(fl!.tips?.length ? [{ key: "fl-safety", dur: 160, el: () => <FreelanceSafety tips={fl!.tips!} /> }] : []),
-        { key: "salary", dur: 150, el: () => <SalaryScene data={d} /> },
       ]
     : [
         { key: "hook", dur: 110, el: () => <Hook data={d} /> },
@@ -56,6 +55,8 @@ export const proScenes = (d: BangTinData): Scene[] => {
   d.lists.filter((l) => !isCanTho(l)).forEach((l) => s.push(region(l)));
   if (!focus && fl?.jobs?.length) s.push({ key: "freelance", dur: 200, el: () => <FreelanceScene kicker={fl.sub} title={fl.name} jobs={fl.jobs!} /> });
   if (!focus && soonJobs(d).length) s.push({ key: "deadline", dur: 150, el: () => <DeadlineScene data={d} /> });
+  // Bản tin sinh viên: lưu ý làm thêm an toàn đặt sau cả ba khu vực, trước cách ứng tuyển
+  if (focus && fl!.tips?.length) s.push({ key: "fl-safety", dur: 160, el: () => <FreelanceSafety tips={fl!.tips!} /> });
   s.push({ key: "steps", dur: 180, el: () => <StepsScene /> });
   s.push({ key: "outro", dur: 170, el: () => <Outro data={d} />, subs: false });
   return s.map((x, i) => {

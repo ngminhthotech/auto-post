@@ -260,9 +260,12 @@ def freelance_lines(d):
                 extra = hourly(j["sal"])
             parts.append(f"{pos[:1].upper() + pos[1:]}{', ở ' + co if co else ''}, {extra}.")
         lines.append(fit(parts, "", limit=285))
-    if fl.get("tips"):
-        lines.append(fit(["Làm thêm an toàn, nhớ nhé!"] + [t.get("say") or t["text"] for t in fl["tips"]], "", limit=290))
     return lines
+
+
+def safety_line(fl):
+    """Lời đọc cảnh làm thêm an toàn (FreelanceSafety), đặt sau các khu vực."""
+    return fit(["Làm thêm an toàn, nhớ nhé!"] + [t.get("say") or t["text"] for t in fl["tips"]], "", limit=290)
 
 
 def script(d):
@@ -322,16 +325,15 @@ def script(d):
         if len(ranked) > 1:
             s += f" Tiếp theo là {ranked[1][0]}, với {count_word(ranked[1][1])} vị trí."
         lines.append(s)
-    # Top lương
-    tops = sorted([j for j in jobs if sal_max(j["sal"])], key=lambda j: -sal_max(j["sal"]))
+    # Top lương (bản tin sinh viên bỏ cảnh này vì trộn nhiều khu vực)
+    tops = [] if focus else sorted([j for j in jobs if sal_max(j["sal"])], key=lambda j: -sal_max(j["sal"]))
     readable_tops = [(j, readable(j["pos"])) for j in tops]
     readable_tops = [(j, p) for j, p in readable_tops if p][:3]
-    if readable_tops:
+    if focus:
+        pass
+    elif readable_tops:
         j0, p0 = readable_tops[0]
-        if focus:
-            s = f"Còn đây là {total} việc làm toàn thời gian. Lương cao nhất, là {lower_first(p0)}, {pay_text(j0['sal'])}."
-        else:
-            s = f"Và đây, là top lương cao nhất! Đứng đầu là {lower_first(p0)}, {pay_text(j0['sal'])}."
+        s = f"Và đây, là top lương cao nhất! Đứng đầu là {lower_first(p0)}, {pay_text(j0['sal'])}."
         rest = [f"{lower_first(p)} ở {region_name(j['region']) if j['region'].isupper() else j['region']}" for j, p in readable_tops[1:]]
         if rest:
             s += " Theo sau là " + ", và ".join(rest) + "."
@@ -344,6 +346,9 @@ def script(d):
         others = [readable(j["pos"]) for j in l["jobs"] if j is not star]
         others = [o for o in others if o]
         s = f"Tại {region_name(l['name'])}."
+        if focus:
+            s = (f"Việc làm toàn thời gian tại {region_name(l['name'])}." if "cần thơ" in l["name"].lower()
+                 else f"Cuối cùng, {region_name(l['name'])}.")
         if star:
             co = readable(star["co"])
             s += f" Việc nổi bật là {lower_first(readable(star['pos']))}"
@@ -360,7 +365,7 @@ def script(d):
         lines.append(region_line(l))
     # Miền Tây
     if d.get("grid") and d["grid"]["cells"]:
-        parts = ["Về miền Tây."]
+        parts = ["Tiếp theo, Đồng bằng sông Cửu Long." if focus else "Về miền Tây."]
         for n, c in enumerate(d["grid"]["cells"]):
             j = next((j for j in c["jobs"] if readable(j["pos"])), None)
             if not j:
@@ -393,6 +398,8 @@ def script(d):
             if pos:
                 parts.append(f"Ngày {j['dl']}, {co + ' tuyển ' + lower_first(pos) if co else lower_first(pos)}.")
         lines.append(fit(parts, "", limit=280))
+    if focus and fl.get("tips"):
+        lines.append(safety_line(fl))
     # Cách ứng tuyển: chọn việc, rồi một trong hai cách (độc lập, không phải các bước nối tiếp)
     lines.append(
         "Ứng tuyển thế nào? Trước hết, chọn việc làm phù hợp, xem kỹ yêu cầu, mức lương, hạn nộp và địa điểm. "
