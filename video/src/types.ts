@@ -1,6 +1,8 @@
 // logo, cover: ảnh của nhà tuyển dụng lấy từ tin gốc (đường dẫn trong video/public hoặc URL)
-// tag, area: dùng cho mục Freelancer / việc làm thêm (vd. "Part-time", "Thực tập", "Làm từ xa"); src: link tin gốc
-export type Job = { pos: string; co: string; sal: string; dl?: string; id?: string; logo?: string; cover?: string; tag?: string; area?: string; src?: string };
+// tag, area, note: dùng cho mục Freelancer / việc làm thêm (vd. tag "Part-time", area "Làm từ xa", note "Ca 16h–23h, xếp theo lịch học"); src: link tin gốc
+export type Job = { pos: string; co: string; sal: string; dl?: string; id?: string; logo?: string; cover?: string; tag?: string; area?: string; note?: string; src?: string };
+// Một nhóm việc làm thêm (Thực tập, Part-time theo ca, Cộng tác viên/online...): total = số tin của nhóm trong danh sách đầy đủ, say = cách đọc ("vị trí thực tập")
+export type FreelanceGroup = { name: string; sub: string; color: string; total?: number; say?: string; jobs: Job[] };
 export type JobList = { name: string; sub: string; theme: string; jobs: Job[] };
 export type Cell = { province: string; color: string; jobs: Job[] };
 export type Stat = { icon: string; value: string; label: string };
@@ -10,8 +12,18 @@ export type BangTinData = {
   stats: Stat[];
   lists: JobList[];
   grid?: { name: string; sub: string; cells: Cell[] };
-  // Mục Freelancer / việc làm thêm cho sinh viên (không tính vào số vị trí, top lương, ngành nghề)
-  freelance?: { name: string; sub: string; jobs: Job[] };
+  // Mục Freelancer / việc làm thêm cho sinh viên (không tính vào số vị trí, top lương, ngành nghề).
+  // Chỉ có jobs: một cảnh sau các khu vực. Có groups: bản tin tập trung sinh viên (mục này lên đầu, nhiều cảnh, xem BangTinPro.tsx).
+  freelance?: {
+    name: string;
+    sub: string;
+    jobs?: Job[];
+    total?: number;
+    stats?: { value: string; label: string; icon: string }[];
+    payNote?: string;
+    groups?: FreelanceGroup[];
+    tips?: { icon: string; text: string }[];
+  };
   notes: string[];
   cta: string;
   // Giọng đọc từng cảnh (render/voice.py tạo), theo thứ tự cảnh trong video

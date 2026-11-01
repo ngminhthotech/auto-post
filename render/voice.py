@@ -222,9 +222,53 @@ def pay_text(sal):
     return "lương từ " + s
 
 
+def hourly(sal):
+    """Đọc mức lương việc làm thêm: "17.000–20.000đ/giờ + tip" -> "17 đến 20 nghìn đồng một giờ, cộng tiền tip"."""
+    s = sal.strip()
+    m = re.match(r"(\d+)\.000\s*(?:đ)?\s*(?:[–-]\s*(\d+)\.000\s*)?đ?\s*/\s*giờ(.*)", s)
+    if m:
+        out = m.group(1) + (f" đến {m.group(2)}" if m.group(2) else "") + " nghìn đồng một giờ"
+        if "tip" in m.group(3):
+            out += ", cộng tiền tip"
+        return out
+    return pay_text(s)
+
+
+def freelance_lines(d):
+    """Lời đọc cho các cảnh việc làm thêm của bản tin tập trung sinh viên (FreelanceScene.tsx): tổng quan, từng nhóm, làm thêm an toàn."""
+    fl = d["freelance"]
+    groups = fl["groups"]
+    lines = []
+    counts = [f"{count_word(g.get('total') or len(g['jobs']))} {g.get('say') or g['name'].lower()}" for g in groups]
+    s = "Việc làm thêm hôm nay có " + ", ".join(counts[:-1]) + (", và " if len(counts) > 1 else "") + counts[-1] + "."
+    if fl.get("payNote"):
+        s += " " + fl["payNote"].rstrip(".") + "."
+    lines.append(fit([s], "", limit=280))
+    for g in groups:
+        parts = [g.get("intro") or f"{g['name']}."]
+        for j in g["jobs"]:
+            pos = readable(j["pos"])
+            if not pos:
+                continue
+            co = readable(re.sub(r"\s*\(.*?\)", "", j["co"]))
+            # Lương thỏa thuận thì đọc ghi chú (ca làm, yêu cầu) cho đỡ lặp
+            if j["sal"].strip().lower().startswith("thỏa thuận") and j.get("note"):
+                extra = readable(re.sub(r"\b(\d{1,2})h\b", r"\1 giờ", j["note"]).replace("–", " đến ")) or "lương thỏa thuận"
+                extra = lower_first(extra)
+            else:
+                extra = hourly(j["sal"])
+            parts.append(f"{pos[:1].upper() + pos[1:]}{', ở ' + co if co else ''}, {extra}.")
+        lines.append(fit(parts, "", limit=285))
+    if fl.get("tips"):
+        lines.append(fit(["Làm thêm an toàn, nhớ nhé!"] + [t.get("say") or t["text"] for t in fl["tips"]], "", limit=290))
+    return lines
+
+
 def script(d):
     """Lời đọc cho mẫu video/src/v2/BangTinPro.tsx, đúng thứ tự cảnh:
     mở đầu, nhà tuyển dụng, ngành nghề, top lương, Cần Thơ, miền Tây, khu vực khác, sắp hết hạn, cách ứng tuyển, kết.
+    Bản tin tập trung sinh viên (JSON có freelance.groups): mở đầu, tổng quan việc làm thêm, từng nhóm, làm thêm an toàn,
+    top lương, Cần Thơ, miền Tây, khu vực khác, cách ứng tuyển, kết.
     Không đọc số điện thoại, không nhắc mã QR (TikTok và các mạng xã hội hay giảm hiển thị video kéo người xem ra ngoài).
     Câu ngắn, có dấu ngắt để giọng lên xuống tự nhiên; tên tiếng Anh khó đọc thì bỏ hoặc dịch."""
     jobs = [dict(j, region=l["name"]) for l in d["lists"] for j in l["jobs"]]
@@ -233,51 +277,59 @@ def script(d):
     total = len(jobs)
     top = max((sal_max(j["sal"]) or 0) for j in jobs)
     dd, mm, yy = (int(x) for x in d["date"].split("/"))
+    fl = d.get("freelance") or {}
+    focus = bool(fl.get("groups"))
     lines = []
-    lines.append(
-        "Xin chào bạn, đến với bản tin Tìm Việc Số, được cập nhật liên tục 24/7. "
-        "Dự án này được nghiên cứu và phát triển tại Học viện Design24. "
-        f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, chúng tôi cập nhật bản tin việc làm, "
-        + (
-            # Có mục Freelancer: bỏ câu lương (đã hiện trên hình) để câu mở đầu vẫn dưới 300 ký tự (giới hạn của Vbee)
-            f"gồm có {total} vị trí, và {count_word(len(d['freelance']['jobs'][:6]))} việc làm thêm cho sinh viên!"
-            if (d.get("freelance") or {}).get("jobs")
-            else f"gồm có {total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!"
-        )
-    )
-    # Nhà tuyển dụng (tường logo) và số vị trí theo khu vực
-    cos = []
-    for j in jobs:
-        co = readable(re.sub(r"\s*\(.*?\)", "", j["co"]))
-        if co and co not in cos:
-            cos.append(co)
-    parts = []
-    if cos:
-        parts.append("Nhà tuyển dụng hôm nay có " + ", ".join(cos[:3]) + (", và nhiều đơn vị khác." if len(cos) > 3 else "."))
-    ct = [l for l in d["lists"] if "cần thơ" in l["name"].lower()]
-    counts = [f"{region_name(l['name'])} có {count_word(len(l['jobs']))} vị trí" for l in ct]
-    if d.get("grid"):
-        counts.append(f"miền Tây có {count_word(sum(len(c['jobs']) for c in d['grid']['cells']))} vị trí")
-    counts += [f"{region_name(l['name'])} có {count_word(len(l['jobs']))} vị trí" for l in d["lists"] if l not in ct]
-    parts.append(", ".join(counts) + ".")
-    lines.append(fit(parts, "", limit=260))
-    # Ngành nghề
-    counts = {}
-    for j in jobs:
-        k = industry(j["pos"])
-        counts[k] = counts.get(k, 0) + 1
-    ranked = sorted(counts.items(), key=lambda x: -x[1])
-    s = f"Ngành tuyển nhiều nhất hôm nay, là {ranked[0][0]}, với {count_word(ranked[0][1])} vị trí."
-    if len(ranked) > 1:
-        s += f" Tiếp theo là {ranked[1][0]}, với {count_word(ranked[1][1])} vị trí."
-    lines.append(s)
+    intro = ("Xin chào bạn, đến với bản tin Tìm Việc Số, được cập nhật liên tục 24/7. "
+             "Dự án này được nghiên cứu và phát triển tại Học viện Design24. "
+             f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, ")
+    if focus:
+        n = fl.get("total") or sum(g.get("total") or len(g["jobs"]) for g in fl["groups"])
+        lines.append(intro + f"bản tin dành riêng cho sinh viên và freelancer, với {n} việc làm thêm, cùng {total} việc làm toàn thời gian!")
+    elif fl.get("jobs"):
+        # Có mục Freelancer: bỏ câu lương (đã hiện trên hình) để câu mở đầu vẫn dưới 300 ký tự (giới hạn của Vbee)
+        lines.append(intro + f"chúng tôi cập nhật bản tin việc làm, gồm có {total} vị trí, và {count_word(len(fl['jobs'][:6]))} việc làm thêm cho sinh viên!")
+    else:
+        lines.append(intro + f"chúng tôi cập nhật bản tin việc làm, gồm có {total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!")
+    if focus:
+        lines += freelance_lines(d)
+    else:
+        # Nhà tuyển dụng (tường logo) và số vị trí theo khu vực
+        cos = []
+        for j in jobs:
+            co = readable(re.sub(r"\s*\(.*?\)", "", j["co"]))
+            if co and co not in cos:
+                cos.append(co)
+        parts = []
+        if cos:
+            parts.append("Nhà tuyển dụng hôm nay có " + ", ".join(cos[:3]) + (", và nhiều đơn vị khác." if len(cos) > 3 else "."))
+        ct = [l for l in d["lists"] if "cần thơ" in l["name"].lower()]
+        counts = [f"{region_name(l['name'])} có {count_word(len(l['jobs']))} vị trí" for l in ct]
+        if d.get("grid"):
+            counts.append(f"miền Tây có {count_word(sum(len(c['jobs']) for c in d['grid']['cells']))} vị trí")
+        counts += [f"{region_name(l['name'])} có {count_word(len(l['jobs']))} vị trí" for l in d["lists"] if l not in ct]
+        parts.append(", ".join(counts) + ".")
+        lines.append(fit(parts, "", limit=260))
+        # Ngành nghề
+        counts = {}
+        for j in jobs:
+            k = industry(j["pos"])
+            counts[k] = counts.get(k, 0) + 1
+        ranked = sorted(counts.items(), key=lambda x: -x[1])
+        s = f"Ngành tuyển nhiều nhất hôm nay, là {ranked[0][0]}, với {count_word(ranked[0][1])} vị trí."
+        if len(ranked) > 1:
+            s += f" Tiếp theo là {ranked[1][0]}, với {count_word(ranked[1][1])} vị trí."
+        lines.append(s)
     # Top lương
     tops = sorted([j for j in jobs if sal_max(j["sal"])], key=lambda j: -sal_max(j["sal"]))
     readable_tops = [(j, readable(j["pos"])) for j in tops]
     readable_tops = [(j, p) for j, p in readable_tops if p][:3]
     if readable_tops:
         j0, p0 = readable_tops[0]
-        s = f"Và đây, là top lương cao nhất! Đứng đầu là {lower_first(p0)}, {pay_text(j0['sal'])}."
+        if focus:
+            s = f"Còn đây là {total} việc làm toàn thời gian. Lương cao nhất, là {lower_first(p0)}, {pay_text(j0['sal'])}."
+        else:
+            s = f"Và đây, là top lương cao nhất! Đứng đầu là {lower_first(p0)}, {pay_text(j0['sal'])}."
         rest = [f"{lower_first(p)} ở {region_name(j['region']) if j['region'].isupper() else j['region']}" for j, p in readable_tops[1:]]
         if rest:
             s += " Theo sau là " + ", và ".join(rest) + "."
@@ -318,21 +370,21 @@ def script(d):
     for l in d["lists"]:
         if l not in can_tho:
             lines.append(region_line(l))
-    # Freelancer / việc làm thêm cho sinh viên (cảnh FreelanceScene.tsx, ngay sau các khu vực)
-    fl = (d.get("freelance") or {}).get("jobs", [])[:6]
-    if fl:
-        names = [p for p in (readable(j["pos"]) for j in fl) if p]
-        parts = [f"Mục mới dành cho các bạn sinh viên: Freelancer và việc làm thêm! Có {count_word(len(fl))} việc"
+    # Freelancer / việc làm thêm cho sinh viên (bản tin thường: một cảnh FreelanceScene.tsx, ngay sau các khu vực)
+    fl_jobs = (fl.get("jobs") or [])[:6] if not focus else []
+    if fl_jobs:
+        names = [p for p in (readable(j["pos"]) for j in fl_jobs) if p]
+        parts = [f"Mục mới dành cho các bạn sinh viên: Freelancer và việc làm thêm! Có {count_word(len(fl_jobs))} việc"
                  + (", như " + ", ".join(lower_first(x) for x in names[:2]) + (", và " + lower_first(names[2]) if len(names) > 2 else "") if names else "")
                  + "."]
         parts.append("Làm theo giờ hoặc làm từ xa, vừa học vừa có thu nhập, lại tích lũy kinh nghiệm sớm.")
         lines.append(fit(parts, "", limit=280))
-    # Sắp hết hạn nộp (giống soonJobs trong DeadlineScene.tsx)
+    # Sắp hết hạn nộp (giống soonJobs trong DeadlineScene.tsx); bản tin sinh viên bỏ cảnh này cho gọn
     def dl_key(j):
         dd_, mm_ = (int(x) for x in j["dl"].split("/")[:2])
         return mm_ * 100 + dd_
     soon = sorted([j for j in jobs if j.get("dl")], key=dl_key)[:4]
-    if soon:
+    if soon and not focus:
         parts = ["Đừng bỏ lỡ những vị trí sắp hết hạn nộp!"]
         for j in soon:
             pos, co = readable(j["pos"]), readable(re.sub(r"\s*\(.*?\)", "", j["co"]))
@@ -343,10 +395,10 @@ def script(d):
     lines.append(
         "Ứng tuyển thế nào? Trước hết, chọn việc làm phù hợp, xem kỹ yêu cầu, mức lương, hạn nộp và địa điểm. "
         "Sau đó, liên hệ trực tiếp với nhà tuyển dụng. Hoặc nhanh hơn, truy cập timviecso.vn, "
-        "hoặc tải ứng dụng Tìm Việc Số trên CH Play."
+        "hoặc tải ứng dụng Tìm Việc Số trên CH Play và App Store."
     )
-    # Kết
-    lines.append("Việc làm mới được cập nhật liên tục. Theo dõi Đì sai hai bốn, để không bỏ lỡ nhé!")
+    # Kết: ứng dụng đã có trên CH Play và App Store ("App Store" đọc "áp sto", xem assets/phat-am.json)
+    lines.append("Ứng dụng Tìm Việc Số đã có trên CH Play và App Store. Theo dõi Design24, để không bỏ lỡ việc làm mới nhé!")
     return [_sub_words(spoken(x), PRON["doc"]) for x in lines]
 
 

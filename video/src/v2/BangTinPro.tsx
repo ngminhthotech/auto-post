@@ -18,7 +18,7 @@ import { RegionScene } from "./RegionScene";
 import { WestScene } from "./WestScene";
 import { StepsScene } from "./StepsScene";
 import { DeadlineScene, soonJobs } from "./DeadlineScene";
-import { FreelanceScene } from "./FreelanceScene";
+import { FreelanceHook, FreelanceOverview, FreelanceSafety, FreelanceScene } from "./FreelanceScene";
 import { Subtitles } from "./Subtitles";
 
 export const FPS = 30;
@@ -31,19 +31,31 @@ type Scene = { key: string; dur: number; el: (dur: number) => React.ReactNode; s
 
 // Thứ tự cảnh (có thêm cảnh Freelancer sau các khu vực nếu JSON có "freelance") phải khớp với thứ tự lời đọc trong render/voice.py (script_pro)
 export const proScenes = (d: BangTinData): Scene[] => {
-  const s: Scene[] = [
-    { key: "hook", dur: 110, el: () => <Hook data={d} /> },
-    { key: "companies", dur: 150, el: () => <CompaniesScene data={d} /> },
-    { key: "industry", dur: 140, el: () => <IndustryScene data={d} /> },
-    { key: "salary", dur: 150, el: () => <SalaryScene data={d} /> },
-  ];
+  const fl = d.freelance;
+  // Bản tin tập trung sinh viên (freelance.groups): mục việc làm thêm lên đầu và chi tiết nhất,
+  // việc làm toàn thời gian rút gọn (bỏ cảnh nhà tuyển dụng, ngành nghề, sắp hết hạn).
+  const focus = !!fl?.groups?.length;
+  const s: Scene[] = focus
+    ? [
+        { key: "hook", dur: 110, el: () => <FreelanceHook data={d} /> },
+        { key: "fl-overview", dur: 150, el: () => <FreelanceOverview fl={fl!} /> },
+        ...fl!.groups!.map((g, i) => ({ key: `fl-${i}`, dur: 200, el: () => <FreelanceScene kicker={g.sub} title={g.name} jobs={g.jobs} color={g.color} /> })),
+        ...(fl!.tips?.length ? [{ key: "fl-safety", dur: 160, el: () => <FreelanceSafety tips={fl!.tips!} /> }] : []),
+        { key: "salary", dur: 150, el: () => <SalaryScene data={d} /> },
+      ]
+    : [
+        { key: "hook", dur: 110, el: () => <Hook data={d} /> },
+        { key: "companies", dur: 150, el: () => <CompaniesScene data={d} /> },
+        { key: "industry", dur: 140, el: () => <IndustryScene data={d} /> },
+        { key: "salary", dur: 150, el: () => <SalaryScene data={d} /> },
+      ];
   // Thứ tự khu vực: Cần Thơ, các tỉnh ĐBSCL, rồi các khu vực còn lại (TP.HCM)
   const region = (l: JobList) => ({ key: `list-${l.name}`, dur: 200, el: (dur: number) => <RegionScene list={l} dur={dur} /> });
   d.lists.filter(isCanTho).forEach((l) => s.push(region(l)));
   if (d.grid?.cells.length) s.push({ key: "west", dur: 160, el: () => <WestScene grid={d.grid!} /> });
   d.lists.filter((l) => !isCanTho(l)).forEach((l) => s.push(region(l)));
-  if (d.freelance?.jobs.length) s.push({ key: "freelance", dur: 200, el: () => <FreelanceScene data={d.freelance!} /> });
-  if (soonJobs(d).length) s.push({ key: "deadline", dur: 150, el: () => <DeadlineScene data={d} /> });
+  if (!focus && fl?.jobs?.length) s.push({ key: "freelance", dur: 200, el: () => <FreelanceScene kicker={fl.sub} title={fl.name} jobs={fl.jobs!} /> });
+  if (!focus && soonJobs(d).length) s.push({ key: "deadline", dur: 150, el: () => <DeadlineScene data={d} /> });
   s.push({ key: "steps", dur: 180, el: () => <StepsScene /> });
   s.push({ key: "outro", dur: 170, el: () => <Outro data={d} />, subs: false });
   return s.map((x, i) => {

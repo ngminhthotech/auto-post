@@ -74,7 +74,8 @@ def logo(json_path):
     folder = PUBLIC / "media"
     folder.mkdir(parents=True, exist_ok=True)
     jobs = [j for l in data["lists"] for j in l["jobs"]] + [j for c in (data.get("grid") or {}).get("cells", []) for j in c["jobs"]]
-    jobs += (data.get("freelance") or {}).get("jobs", [])
+    fl = data.get("freelance") or {}
+    jobs += fl.get("jobs", []) + [j for g in fl.get("groups", []) for j in g["jobs"]]
     for j in jobs:
         # Tin từ nguồn khác (Việc Làm Cần Thơ, Việc Làm 24h, VietnamWorks...): "logo" là URL ảnh, tải về máy để dựng ổn định
         if str(j.get("logo", "")).startswith("http"):
