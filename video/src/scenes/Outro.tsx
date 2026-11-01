@@ -7,7 +7,7 @@ import { BrandBackground, ease, Icon, Logo, Reveal, useSpring } from "../ui";
 // Không đưa số điện thoại, email hay mã QR lên hình: TikTok và các mạng xã hội hay giảm hiển thị những video này.
 const ITEMS = [
   { icon: "globe", label: "Website", value: CONTACT.website },
-  { icon: "send", label: "Ứng dụng", value: "Tìm Việc Số • CH Play, App Store" },
+  { icon: "send", label: "Ứng dụng", value: "Tìm Việc Số • Android và iOS" },
 ];
 
 export const Outro: React.FC<{ data: BangTinData }> = ({ data }) => {
