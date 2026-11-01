@@ -20,7 +20,10 @@
     "SIXDO": "Síc đô",
     "V.M.S": "vê em ét",
     "Sonacons": "Sô na con",
-    "CHPlay": "sê hắc lây"
+    "CHPlay": "sê hắc lây",
+    "Freelancer": "phri lan xơ",
+    "Freelance": "phri lan",
+    "Part-time": "bán thời gian"
   },
   "dich": {
     "Quality Manager": "Quản lý chất lượng",
@@ -40,6 +43,9 @@
     "HVAC": "điều hòa thông gió",
     "BIM": "mô hình thông tin công trình",
     "IT": "công nghệ thông tin",
-    "Marketing": "ma két tinh"
+    "Marketing": "ma két tinh",
+    "Digital Marketing": "ma két tinh số",
+    "Software Tester": "kiểm thử phần mềm",
+    "Social Media": "mạng xã hội"
   }
 }

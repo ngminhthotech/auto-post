@@ -238,7 +238,12 @@ def script(d):
         "Xin chào bạn, đến với bản tin Tìm Việc Số, được cập nhật liên tục 24/7. "
         "Dự án này được nghiên cứu và phát triển tại Học viện Design24. "
         f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, chúng tôi cập nhật bản tin việc làm, "
-        f"gồm có {total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!"
+        + (
+            # Có mục Freelancer: bỏ câu lương (đã hiện trên hình) để câu mở đầu vẫn dưới 300 ký tự (giới hạn của Vbee)
+            f"gồm có {total} vị trí, và {count_word(len(d['freelance']['jobs'][:6]))} việc làm thêm cho sinh viên!"
+            if (d.get("freelance") or {}).get("jobs")
+            else f"gồm có {total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!"
+        )
     )
     # Nhà tuyển dụng (tường logo) và số vị trí theo khu vực
     cos = []
@@ -313,6 +318,15 @@ def script(d):
     for l in d["lists"]:
         if l not in can_tho:
             lines.append(region_line(l))
+    # Freelancer / việc làm thêm cho sinh viên (cảnh FreelanceScene.tsx, ngay sau các khu vực)
+    fl = (d.get("freelance") or {}).get("jobs", [])[:6]
+    if fl:
+        names = [p for p in (readable(j["pos"]) for j in fl) if p]
+        parts = [f"Mục mới dành cho các bạn sinh viên: Freelancer và việc làm thêm! Có {count_word(len(fl))} việc"
+                 + (", như " + ", ".join(lower_first(x) for x in names[:2]) + (", và " + lower_first(names[2]) if len(names) > 2 else "") if names else "")
+                 + "."]
+        parts.append("Làm theo giờ hoặc làm từ xa, vừa học vừa có thu nhập, lại tích lũy kinh nghiệm sớm.")
+        lines.append(fit(parts, "", limit=280))
     # Sắp hết hạn nộp (giống soonJobs trong DeadlineScene.tsx)
     def dl_key(j):
         dd_, mm_ = (int(x) for x in j["dl"].split("/")[:2])

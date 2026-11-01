@@ -18,6 +18,7 @@ import { RegionScene } from "./RegionScene";
 import { WestScene } from "./WestScene";
 import { StepsScene } from "./StepsScene";
 import { DeadlineScene, soonJobs } from "./DeadlineScene";
+import { FreelanceScene } from "./FreelanceScene";
 import { Subtitles } from "./Subtitles";
 
 export const FPS = 30;
@@ -28,7 +29,7 @@ const isCanTho = (l: JobList) => /cần thơ/i.test(l.name);
 
 type Scene = { key: string; dur: number; el: (dur: number) => React.ReactNode; subs?: boolean };
 
-// Thứ tự cảnh phải khớp với thứ tự lời đọc trong render/voice.py (script_pro)
+// Thứ tự cảnh (có thêm cảnh Freelancer sau các khu vực nếu JSON có "freelance") phải khớp với thứ tự lời đọc trong render/voice.py (script_pro)
 export const proScenes = (d: BangTinData): Scene[] => {
   const s: Scene[] = [
     { key: "hook", dur: 110, el: () => <Hook data={d} /> },
@@ -41,6 +42,7 @@ export const proScenes = (d: BangTinData): Scene[] => {
   d.lists.filter(isCanTho).forEach((l) => s.push(region(l)));
   if (d.grid?.cells.length) s.push({ key: "west", dur: 160, el: () => <WestScene grid={d.grid!} /> });
   d.lists.filter((l) => !isCanTho(l)).forEach((l) => s.push(region(l)));
+  if (d.freelance?.jobs.length) s.push({ key: "freelance", dur: 200, el: () => <FreelanceScene data={d.freelance!} /> });
   if (soonJobs(d).length) s.push({ key: "deadline", dur: 150, el: () => <DeadlineScene data={d} /> });
   s.push({ key: "steps", dur: 180, el: () => <StepsScene /> });
   s.push({ key: "outro", dur: 170, el: () => <Outro data={d} />, subs: false });

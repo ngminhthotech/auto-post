@@ -1,7 +1,8 @@
 """Tư liệu hình ảnh cho video bảng tin: cảnh quay thật làm nền từng cảnh và logo/ảnh bìa nhà tuyển dụng.
 
 Cảnh quay lấy từ Mixkit (miễn phí, dùng thương mại không cần ghi nguồn), tải về video/public/broll/.
-Logo, ảnh bìa lấy từ tin gốc trên CareerViet (trường "id" của từng tin là mã tin CareerViet, ví dụ 35C8A209).
+Logo, ảnh bìa lấy từ tin gốc trên CareerViet (trường "id" của từng tin là mã tin CareerViet, ví dụ 35C8A209);
+tin từ nguồn khác ghi thẳng URL ảnh vào trường "logo", chương trình tự tải về.
 
 Ví dụ:
   python3 render/tulieu.py broll out/props.json            # gán cảnh quay cho 9 cảnh của BangTinPro
@@ -12,6 +13,7 @@ Ví dụ:
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -72,8 +74,18 @@ def logo(json_path):
     folder = PUBLIC / "media"
     folder.mkdir(parents=True, exist_ok=True)
     jobs = [j for l in data["lists"] for j in l["jobs"]] + [j for c in (data.get("grid") or {}).get("cells", []) for j in c["jobs"]]
+    jobs += (data.get("freelance") or {}).get("jobs", [])
     for j in jobs:
-        if not j.get("id"):
+        # Tin từ nguồn khác (Việc Làm Cần Thơ, Việc Làm 24h, VietnamWorks...): "logo" là URL ảnh, tải về máy để dựng ổn định
+        if str(j.get("logo", "")).startswith("http"):
+            url = j.pop("logo")
+            path = folder / f"{hashlib.md5(url.encode()).hexdigest()[:12]}-logo{Path(url.split('?')[0]).suffix.lower() or '.png'}"
+            try:
+                if path.exists() or _save_image(url, path):
+                    j["logo"] = f"media/{path.name}"
+            except (requests.RequestException, OSError) as exc:
+                print(f"{url}: {exc}", file=sys.stderr)
+        if not re.fullmatch(r"[0-9A-F]{8}", j.get("id") or ""):
             continue
         d = careerviet.detail(j["id"])
         for key, field in (("logo", "emp_logo"), ("cover", "emp_banner_cover")):
