@@ -404,9 +404,9 @@ def script(d):
     lines.append(
         "Ứng tuyển thế nào? Trước hết, chọn việc làm phù hợp, xem kỹ yêu cầu, mức lương, hạn nộp và địa điểm. "
         "Sau đó, liên hệ trực tiếp với nhà tuyển dụng. Hoặc nhanh hơn, truy cập timviecso.vn, "
-        "hoặc tải ứng dụng Tìm Việc Số trên Android và iOS."
+        "hoặc tải ứng dụng Tìm Việc Số."
     )
-    # Kết: ứng dụng đã có trên Android và iOS (cách đọc nằm trong assets/phat-am.json)
+    # Kết: ứng dụng đã có trên Android và iOS (chỉ nói ở câu kết, câu hướng dẫn không lặp lại)
     lines.append("Ứng dụng Tìm Việc Số đã có trên Android và iOS. Theo dõi Design24, để không bỏ lỡ việc làm mới nhé!")
     return [_sub_words(spoken(x), PRON["doc"]) for x in lines]
 
