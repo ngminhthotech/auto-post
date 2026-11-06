@@ -4,6 +4,11 @@ import { C, CONTACT, FONT } from "../brand";
 import type { BangTinData } from "../types";
 import { BrandBackground, ease, Icon, Logo, Reveal, useSpring } from "../ui";
 
+// TikTok xem lời mời "Inbox / nhắn tin để nhận link" là dấu hiệu lừa đảo việc làm
+// (kéo người xem ra khỏi nền tảng), nên thay bằng lời mời xem trên timviecso.vn.
+const SAFE_CTA = (cta?: string) =>
+  !cta || /inbox|nhắn tin|zalo|ib\b|link/i.test(cta) ? "Xem chi tiết tại timviecso.vn" : cta;
+
 // Không đưa số điện thoại, email hay mã QR lên hình: TikTok và các mạng xã hội hay giảm hiển thị những video này.
 const ITEMS = [
   { icon: "globe", label: "Website", value: CONTACT.website },
@@ -27,7 +32,7 @@ export const Outro: React.FC<{ data: BangTinData }> = ({ data }) => {
       <div style={{ position: "absolute", top: 790, left: 80, right: 80, display: "flex", justifyContent: "center", opacity: ease(frame, 22, 34, [0, 1]) }}>
         <div style={{ scale: String(pulse), background: `linear-gradient(90deg, ${C.orange}, ${C.orange2})`, borderRadius: 999, padding: "30px 44px", fontSize: 40, fontWeight: 800, textAlign: "center", boxShadow: `0 0 ${30 + Math.sin(frame / 5) * 14}px rgba(255,127,20,.7)`, display: "flex", alignItems: "center", gap: 18 }}>
           <Icon name="send" size={42} color="#fff" />
-          {data.cta}
+          {SAFE_CTA(data.cta)}
         </div>
       </div>
       <div style={{ position: "absolute", top: 1010, left: 70, right: 70, display: "flex", flexDirection: "column", gap: 20 }}>
