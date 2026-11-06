@@ -90,7 +90,12 @@ def default_metadata(service, title=None, video=False):
     if service == "facebook":
         return {"facebook": {"type": "reel" if video else "post"}}
     if service == "tiktok":
-        return {"tiktok": {"title": title}} if title else None
+        # Giọng đọc là AI (Vbee) nên luôn gắn nhãn nội dung AI; TikTok gỡ hoặc hạn chế
+        # video dùng AI mà không gắn nhãn.
+        meta = {"isAiGenerated": True}
+        if title:
+            meta["title"] = title
+        return {"tiktok": meta}
     if service == "youtube":
         meta = {"categoryId": YOUTUBE_CATEGORY, "privacy": "public", "madeForKids": False}
         if title:
