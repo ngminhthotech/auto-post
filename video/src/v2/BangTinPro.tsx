@@ -56,7 +56,7 @@ export const proScenes = (d: BangTinData): Scene[] => {
   if (!focus && fl?.jobs?.length) s.push({ key: "freelance", dur: 200, el: () => <FreelanceScene kicker={fl.sub} title={fl.name} jobs={fl.jobs!} /> });
   if (!focus && soonJobs(d).length) s.push({ key: "deadline", dur: 150, el: () => <DeadlineScene data={d} /> });
   // Bản tin sinh viên: lưu ý làm thêm an toàn đặt sau cả ba khu vực, trước cách ứng tuyển
-  if (focus && fl!.tips?.length) s.push({ key: "fl-safety", dur: 160, el: () => <FreelanceSafety tips={fl!.tips!} /> });
+  if (focus) s.push({ key: "fl-safety", dur: 160, el: () => <FreelanceSafety /> });
   s.push({ key: "steps", dur: 180, el: () => <StepsScene /> });
   s.push({ key: "outro", dur: 170, el: () => <Outro data={d} />, subs: false });
   return s.map((x, i) => {

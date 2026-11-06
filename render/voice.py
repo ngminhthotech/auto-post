@@ -413,7 +413,7 @@ def script(d):
             if pos:
                 parts.append(f"Ngày {j['dl']}, {co + ' tuyển ' + lower_first(pos) if co else lower_first(pos)}.")
         lines.append(fit(parts, "", limit=280))
-    if focus and fl.get("tips"):
+    if focus:
         lines.append(safety_line(fl))
     # Cách ứng tuyển: chọn việc, rồi một trong hai cách (độc lập, không phải các bước nối tiếp)
     lines.append(
