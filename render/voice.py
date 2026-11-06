@@ -263,9 +263,24 @@ def freelance_lines(d):
     return lines
 
 
+SAFE_TIPS = json.loads((Path(__file__).resolve().parent.parent / "video/src/v2/safeTips.json").read_text(encoding="utf-8"))
+
+# Từ khiến TikTok xếp video vào nhóm lừa đảo việc làm hoặc kéo người xem ra ngoài nền tảng
+# (tài khoản @timviecso.vn bị cảnh cáo ngày 06/11/2026). Lời đọc có các từ này thì dừng, sửa JSON.
+RISKY = re.compile(r"\bphí\b|đặt cọc|chuyển (?:tiền|khoản)|nạp tiền|nhiệm vụ|hoa hồng|lừa đảo|\binbox\b|nhắn tin|"
+                   r"\bzalo\b|da lô|kiếm tiền|việc nhẹ|lương cao|tại nhà|\bonline\b|on lai|làm từ xa|\bremote\b", re.I)
+
+
+def check_risky(lines):
+    bad = sorted({m.group(0).lower() for x in lines for m in RISKY.finditer(x)})
+    if bad:
+        raise SystemExit("Lời đọc có từ dễ bị TikTok gắn vi phạm hoặc bóp tương tác: " + ", ".join(bad) +
+                         ". Sửa JSON (bỏ tin hoặc viết lại) rồi chạy lại. Xem ROUTINE.md, mục Nội dung an toàn.")
+
+
 def safety_line(fl):
-    """Lời đọc cảnh làm thêm an toàn (FreelanceSafety), đặt sau các khu vực."""
-    return fit(["Làm thêm an toàn, nhớ nhé!"] + [t.get("say") or t["text"] for t in fl["tips"]], "", limit=290)
+    """Lời đọc cảnh mẹo ứng tuyển (FreelanceSafety), đặt sau các khu vực. Luôn dùng safeTips.json."""
+    return fit(["Vài mẹo nhỏ khi ứng tuyển nhé!"] + [t["say"] for t in SAFE_TIPS], "", limit=290)
 
 
 def script(d):
@@ -565,6 +580,8 @@ def main(argv=None):
     a = p.parse_args(argv)
     data = json.loads(Path(a.json).read_text(encoding="utf-8"))
     lines = script(data) if a.style == "pro" else script_basic(data)
+    if a.style == "pro":
+        check_risky(lines)
     if a.dry_run:
         for i, line in enumerate(lines):
             print(f"[{i}] ({len(line)} ký tự) {line}")

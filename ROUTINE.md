@@ -16,6 +16,17 @@ Thứ tự video (không đảo, không trộn vùng): mở đầu sinh viên �
 6. Đăng (hẹn `--at` 7:00 nếu còn kịp, không thì đăng ngay): Facebook dùng `--metadata '{"facebook":{"type":"post"}}'` (Reels chỉ nhận ≤90 giây); TikTok `--service tiktok --title`; YouTube `--service youtube --title "... #Shorts"`. **TikTok KHÔNG BAO GIỜ đăng lại cùng một video trong ngày**, kể cả khi Buffer báo kẹt "sending" hay lỗi: ngày 03/11 và 05/11 bài "kẹt" thật ra đã lên TikTok, lần thử lại tạo video trùng và TikTok cảnh cáo tài khoản (06/11/2026, thêm 3 cảnh cáo có thể bị cấm). TikTok kẹt thì chỉ ghi vào báo cáo, không thử lại, không xóa rồi đăng lại.
 7. Lưu bài vào `/mnt/project-files/auto-post/bai-<ngày>-0700/`; ghi dòng mới vào tab `Lich dang` của sheet "Lich dang" (id, link, trạng thái). Kênh lỗi: ghi lỗi, không đăng lại quá 2 lần.
 
+### Nội dung an toàn (bắt buộc cho mọi video và chú thích, từ 06/11/2026)
+
+Tài khoản TikTok @timviecso.vn đã bị cảnh cáo (thêm 3 lần có thể bị cấm). Tránh mọi thứ khiến video bị xếp vào nhóm lừa đảo việc làm, spam hoặc bị giảm hiển thị; thay bằng cách nói tích cực:
+
+- Không nói, không ghi các từ: phí, đặt cọc, chuyển tiền/chuyển khoản, nạp tiền, nhiệm vụ, hoa hồng, lừa đảo, kiếm tiền, việc nhẹ lương cao, Inbox, nhắn tin, Zalo, tại nhà, online, làm từ xa. Thay "không thu phí" bằng "tin có tên công ty, địa chỉ rõ ràng"; thay cảnh "Làm thêm an toàn" bằng "Mẹo ứng tuyển" (mẫu tự dùng `video/src/v2/safeTips.json`, không cần viết `tips`). `render/voice.py` tự dừng nếu lời đọc còn các từ này: sửa JSON rồi chạy lại, không lách bằng cách viết sai chính tả.
+- Bỏ hẳn tin online, tại nhà, cần laptop, làm từ xa (`autopost.sinhvien` đã tự lọc); không đưa tin không có tên công ty.
+- Lời mời cuối chỉ là "Xem chi tiết tại timviecso.vn"; không kêu gọi nhắn tin, gọi điện, quét mã, bấm link.
+- Chú thích TikTok: 1 đến 2 câu mô tả bản tin (số việc, khu vực), không ghi mức lương theo giờ, không ghi "không đóng phí", không biểu tượng ⚠️, 4 đến 5 hashtag trung tính như #sinhviencantho #vieclamcantho #timviecso #huongnghiep #cantho (không #vieclamthem #parttime #kiemtienonline #vieclamonline).
+- Mỗi ngày chỉ 1 video TikTok; không đăng lại, kể cả khi Buffer báo kẹt.
+- Bài TikTok luôn gắn nhãn AI (`isAiGenerated`, `autopost.buffer` tự thêm).
+
 ## Routine soạn bài (20:00 mỗi tối)
 
 1. Đọc file quy tắc `00_Thuong hieu/Quy tac noi dung tuyen dung` trên Drive. Quy tắc trong file đó luôn được ưu tiên.

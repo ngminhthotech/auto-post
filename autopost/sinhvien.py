@@ -29,7 +29,9 @@ STUDENT = re.compile(r"thực tập|thuc tap|\btts\b|intern|học việc|part[\s
                      r"thời vụ|cộng tác|\bctv\b|trợ giảng|sinh viên|làm thêm|freelance|tại nhà|online|remote", re.I)
 # Bỏ: ăn hoa hồng tài chính, thu nợ, bất động sản, đòi tiền
 EXCLUDE = re.compile(r"bảo hiểm|thẻ tín dụng|mở thẻ|cho vay|vay tiêu dùng|tài chính|trả góp|thu hồi nợ|đòi nợ|"
-                     r"bất động sản|\bbđs\b|chứng khoán|đặt cọc|phí hồ sơ|nạp tiền|làm nhiệm vụ|tuyển dụng toàn quốc", re.I)
+                     r"bất động sản|\bbđs\b|chứng khoán|đặt cọc|phí hồ sơ|nạp tiền|làm nhiệm vụ|tuyển dụng toàn quốc|"
+                     # việc online, tại nhà: TikTok hay xếp vào nhóm lừa đảo việc làm (cảnh cáo 06/11/2026)
+                     r"tại nhà|online|remote|từ xa|work from home|\bwfh\b|cần laptop", re.I)
 
 
 def kind(pos):

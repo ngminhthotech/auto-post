@@ -64,7 +64,7 @@ export const Outro: React.FC<{ data: BangTinData }> = ({ data }) => {
       <div style={{ position: "absolute", bottom: 150, left: 70, right: 70, display: "flex", alignItems: "center", gap: 20, background: "#fff", color: C.ink, borderRadius: 26, padding: "24px 30px", opacity: ease(frame, 64, 78, [0, 1]), translate: `0px ${ease(frame, 64, 82, [60, 0])}px` }}>
         <Icon name="shield" size={60} color={C.orange} />
         <div style={{ fontSize: 34, fontWeight: 700, lineHeight: 1.25 }}>
-          Nhà tuyển dụng thật <span style={{ color: C.orange }}>không bao giờ thu phí</span> ứng viên
+          Tin tuyển dụng có <span style={{ color: C.orange }}>tên công ty rõ ràng</span>, cập nhật mỗi ngày
         </div>
       </div>
       <div style={{ position: "absolute", bottom: 80, left: 0, right: 0, textAlign: "center", fontSize: 30, fontWeight: 600, opacity: ease(frame, 76, 90, [0, 0.85]) }}>

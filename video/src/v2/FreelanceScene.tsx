@@ -5,6 +5,7 @@ import type { BangTinData, Job } from "../types";
 import { allJobs, industryOf } from "../derive";
 import { BrandBackground, ease, Logo, TopBar, useSpring } from "../ui";
 import { CoLogo, Ico, Title } from "./kit";
+import SAFE_TIPS from "./safeTips.json";
 
 // Các cảnh của mục Freelancer / việc làm thêm cho sinh viên.
 // Bản tin thường: chỉ FreelanceScene (một cảnh). Bản tin tập trung sinh viên (JSON có freelance.groups):
@@ -150,20 +151,22 @@ export const FreelanceOverview: React.FC<{ fl: FL }> = ({ fl }) => {
   );
 };
 
-// Làm thêm an toàn: các lưu ý chống lừa đảo cho sinh viên.
-export const FreelanceSafety: React.FC<{ tips: { icon: string; text: string }[] }> = ({ tips }) => {
+// Mẹo ứng tuyển cho sinh viên. Luôn dùng safeTips.json (lời khuyên tích cực), bỏ qua tips trong JSON:
+// các từ như "phí", "đặt cọc", "chuyển tiền" khiến TikTok xếp video vào nhóm lừa đảo việc làm (cảnh cáo 06/11/2026).
+export const FreelanceSafety: React.FC<{ tips?: { icon: string; text: string }[] }> = () => {
+  const tips = SAFE_TIPS;
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ fontFamily: FONT, color: "#fff" }}>
       <BrandBackground />
       <TopBar />
-      <Title kicker="Lưu ý cho sinh viên" title="Làm thêm an toàn" color="#E53935" />
+      <Title kicker="Dành cho sinh viên" title="Mẹo ứng tuyển" color={C.blue1} />
       <div style={{ position: "absolute", top: 450, left: 60, right: 60, display: "flex", flexDirection: "column", gap: 22 }}>
         {tips.slice(0, 5).map((t, i) => {
           const d = 12 + i * 12;
           return (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 26, background: "#fff", color: C.ink, borderRadius: 28, padding: "24px 28px", boxShadow: "0 16px 40px rgba(0,0,0,.3)", opacity: ease(frame, d, d + 10, [0, 1]), translate: `${ease(frame, d, d + 18, [500, 0])}px 0px` }}>
-              <div style={{ width: 96, height: 96, flex: "none", borderRadius: "50%", background: i === tips.length - 1 ? C.orange : "#E53935", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 96, height: 96, flex: "none", borderRadius: "50%", background: i % 2 ? C.orange : C.blue1, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Ico name={t.icon} size={52} />
               </div>
               <div style={{ fontSize: 36, fontWeight: 800, lineHeight: 1.25 }}>{t.text}</div>
