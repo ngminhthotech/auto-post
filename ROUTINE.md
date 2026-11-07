@@ -2,7 +2,6 @@
 
 ## Routine bản tin video (7:00 mỗi sáng, luồng chuẩn từ 02/11/2026)
 
-> **TẠM DỪNG TIKTOK (chủ dự án chọn ngày 06/11/2026):** nếu hôm nay (giờ Việt Nam) là ngày 06, 07, 08 hoặc 09/11/2026 thì KHÔNG dựng bản TikTok và KHÔNG đăng TikTok, chỉ đăng Facebook và YouTube. Báo cáo ghi "TikTok tạm dừng đến hết 09/11 (chờ kháng nghị)"; đây không phải lỗi, không mở đầu bằng "⚠️ CẦN XỬ LÝ" vì lý do này. Từ 10/11/2026 bỏ qua đoạn này và đăng TikTok bình thường.
 
 Một video bản tin mỗi ngày, đăng 7:00 (giờ Việt Nam) lên Facebook, TikTok @timviecso.vn và YouTube qua Buffer (id kênh trong `channels.json`). Bản mẫu chuẩn: `/mnt/project-files/auto-post/bai-2026-11-01-1706/` (video, `bangtin.json`, chú thích).
 
@@ -24,7 +23,7 @@ Tài khoản TikTok @timviecso.vn đã bị cảnh cáo (thêm 3 lần có thể
 - Bỏ hẳn tin online, tại nhà, cần laptop, làm từ xa (`autopost.sinhvien` đã tự lọc); không đưa tin không có tên công ty.
 - Lời mời cuối chỉ là "Xem chi tiết tại timviecso.vn"; không kêu gọi nhắn tin, gọi điện, quét mã, bấm link.
 - Chú thích TikTok: 1 đến 2 câu mô tả bản tin (số việc, khu vực), không ghi mức lương theo giờ, không ghi "không đóng phí", không biểu tượng ⚠️, 4 đến 5 hashtag trung tính như #sinhviencantho #vieclamcantho #timviecso #huongnghiep #cantho (không #vieclamthem #parttime #kiemtienonline #vieclamonline).
-- Mỗi ngày chỉ 1 video TikTok; không đăng lại, kể cả khi Buffer báo kẹt.
+- Mỗi ngày chỉ 1 video TikTok; không đăng lại, kể cả khi Buffer báo kẹt. `autopost.buffer post` tự chặn bài TikTok thứ hai trong 20 giờ (báo "KHÔNG ĐĂNG"): gặp lỗi này thì ghi vào báo cáo, không tìm cách lách. Không xóa bài TikTok trên Buffer rồi đăng lại.
 - Bài TikTok luôn gắn nhãn AI (`isAiGenerated`, `autopost.buffer` tự thêm).
 
 ## Routine soạn bài (20:00 mỗi tối)
