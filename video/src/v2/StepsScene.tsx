@@ -6,10 +6,10 @@ import { Ico, Title } from "./kit";
 
 const WAYS = [
   { icon: "phone", k: "CÁCH 1", t: "Liên hệ trực tiếp nhà tuyển dụng", s: "Gọi điện, gửi hồ sơ theo thông tin trong tin tuyển dụng" },
-  { icon: "globe", k: "CÁCH 2 • NHANH HƠN", t: "timviecso.vn hoặc app Tìm Việc Số", s: "Tải trên CH Play" },
+  { icon: "globe", k: "CÁCH 2 • NHANH HƠN", t: "timviecso.vn hoặc app Tìm Việc Số", s: "Tải trên Android và iOS" },
 ];
 
-// Bước 1 chọn việc, sau đó 2 cách ứng tuyển độc lập (HOẶC), cuối cùng cảnh báo lừa đảo.
+// Bước 1 chọn việc, sau đó 2 cách ứng tuyển độc lập (HOẶC), cuối cùng một mẹo chọn tin uy tín.
 export const StepsScene: React.FC = () => {
   const frame = useCurrentFrame();
   const pick = useSpring(10, 13, 150);
@@ -50,9 +50,9 @@ export const StepsScene: React.FC = () => {
           HOẶC
         </div>
       </div>
-      <div style={{ position: "absolute", top: 1330, left: 70, right: 70, display: "flex", alignItems: "center", gap: 24, background: "rgba(229,57,53,.92)", borderRadius: 26, padding: "20px 28px", opacity: ease(frame, 80, 92, [0, 1]) }}>
-        <Ico name="alert" size={64} />
-        <div style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.25 }}>Không nộp phí, không đặt cọc, không chuyển khoản để được nhận việc.</div>
+      <div style={{ position: "absolute", top: 1330, left: 70, right: 70, display: "flex", alignItems: "center", gap: 24, background: "rgba(255,255,255,.14)", borderRadius: 26, padding: "20px 28px", opacity: ease(frame, 80, 92, [0, 1]) }}>
+        <Ico name="shield" size={64} />
+        <div style={{ fontSize: 32, fontWeight: 700, lineHeight: 1.25 }}>Ưu tiên tin có tên công ty, địa chỉ và mức lương rõ ràng.</div>
       </div>
     </AbsoluteFill>
   );

@@ -3,6 +3,7 @@ import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 import {
   BadgeDollarSign, Briefcase, Building2, Calculator, CalendarClock, Factory, Globe, HardHat, Landmark, Mail,
   MapPin, MessageCircle, Phone, Search, Send, ShieldAlert, ShieldCheck, Sparkles, TrendingUp, Truck, Ban,
+  GraduationCap, Clock, Laptop, Wallet, IdCard, HandCoins, FileText, Users,
 } from "lucide-react";
 import { C } from "../brand";
 import { ease } from "../ui";
@@ -11,7 +12,8 @@ const ICONS = {
   calculator: Calculator, hardhat: HardHat, trending: TrendingUp, factory: Factory, landmark: Landmark, truck: Truck,
   pin: MapPin, money: BadgeDollarSign, briefcase: Briefcase, building: Building2, calendar: CalendarClock, search: Search,
   chat: MessageCircle, send: Send, shield: ShieldCheck, alert: ShieldAlert, sparkles: Sparkles, phone: Phone, globe: Globe,
-  mail: Mail, ban: Ban,
+  mail: Mail, ban: Ban, graduation: GraduationCap, clock: Clock, laptop: Laptop, wallet: Wallet, idcard: IdCard,
+  coins: HandCoins, file: FileText, users: Users,
 };
 export type IconName = keyof typeof ICONS;
 
