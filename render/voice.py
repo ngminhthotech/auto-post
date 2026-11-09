@@ -299,20 +299,26 @@ def script(d):
     fl = d.get("freelance") or {}
     focus = bool(fl.get("groups"))
     lines = []
-    # Người dẫn chương trình (Hoài Anh) tự giới thiệu ở cảnh mở đầu
-    intro = ("Xin chào quý vị và các bạn, chào mừng đến với kênh truyền hình việc làm Cần Thơ. "
-             "Tôi là Hoài Anh, đến từ Học viện Design24. "
-             "Đây là Bản tin Tìm Việc Số, nơi việc làm được cập nhật liên tục 24/7, mang đến cho bạn những cơ hội việc làm mới nhất. "
-             f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, ")
+    # Người dẫn chương trình (Hoài Anh) tự giới thiệu ở cảnh mở đầu, rồi nói số việc toàn thời gian theo từng khu vực
+    intro = ("Xin chào các bạn, chào mừng đến với kênh truyền hình việc làm Cần Thơ. "
+             "Tôi là Hoài Anh của Học viện Design24. "
+             f"Đây là Bản tin Tìm Việc Số, ngày {dd}, tháng {mm}, năm {yy}, bản tin việc làm dành cho các bạn gồm ")
+    areas = [(region_name(l["name"]), len(l["jobs"])) for l in d["lists"] if "cần thơ" in l["name"].lower()]
+    if d.get("grid"):
+        areas.append(("Đồng bằng sông Cửu Long", sum(len(c["jobs"]) for c in d["grid"]["cells"])))
+    areas += [(region_name(l["name"]), len(l["jobs"])) for l in d["lists"] if "cần thơ" not in l["name"].lower()]
+    areas = [f"{n} tại {name}" for name, n in areas if n]
+    by_area = ""
+    if len(areas) > 1:
+        by_area = ": " + ", ".join(areas[:-1]) + ", và " + areas[-1]
     if focus:
         n = fl.get("total") or sum(g.get("total") or len(g["jobs"]) for g in fl["groups"])
         what = fl.get("say") or ("việc làm thêm" + (f" tại {fl['place']}" if fl.get("place") else ""))
-        lines.append(intro + f"bản tin việc làm dành cho các bạn gồm {n} {what}, cùng {total} việc làm toàn thời gian.")
+        lines.append(intro + f"{n} {what}, cùng {total} việc làm toàn thời gian{by_area}.")
     elif fl.get("jobs"):
-        # Có mục Freelancer: bỏ câu lương (đã hiện trên hình) để câu mở đầu vẫn dưới 300 ký tự (giới hạn của Vbee)
-        lines.append(intro + f"bản tin việc làm dành cho các bạn gồm {total} vị trí tuyển dụng, cùng {count_word(len(fl['jobs'][:6]))} việc làm thêm dành cho sinh viên.")
+        lines.append(intro + f"{total} vị trí tuyển dụng{by_area}, cùng {count_word(len(fl['jobs'][:6]))} việc làm thêm dành cho sinh viên.")
     else:
-        lines.append(intro + f"bản tin việc làm dành cho các bạn gồm {total} vị trí tuyển dụng, với mức lương cao nhất lên đến {int(top)} triệu đồng một tháng.")
+        lines.append(intro + f"{total} vị trí tuyển dụng{by_area}. Có vị trí trả lương lên đến {int(top)} triệu đồng một tháng.")
     if focus:
         lines += freelance_lines(d)
     else:
