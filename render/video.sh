@@ -2,6 +2,7 @@
 # Dựng video động thương hiệu D24 (Remotion, mẫu BangTinPro; COMP=BangTin để dùng mẫu cũ) từ JSON bảng tin, có nhạc nền, chuẩn âm lượng -14 LUFS.
 # Cách dùng: render/video.sh examples/bangtin-mau.json out/video.mp4 [--voice]
 #   --voice: thêm giọng đọc Vbee (cần khóa Vbee trong môi trường, xem render/voice.py)
+#   PRESENTER=1 render/video.sh ... --voice: mở đầu bằng người dẫn chương trình nói từ ảnh assets/nguoi-dan.jpg (render/presenter.py)
 set -euo pipefail
 json="$(realpath "$1")"; out="$(realpath -m "$2")"; voice="${3:-}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -13,6 +14,11 @@ if [ "$voice" = "--voice" ]; then
   style=pro; [ "${COMP:-BangTinPro}" = "BangTin" ] && style=basic
   python3 "$root/render/voice.py" "$json" --style "$style" --out "$tmp/props.json" >/dev/null
   json="$tmp/props.json"
+  # Người dẫn chương trình ở cảnh mở đầu: PRESENTER=1 (fal.ai, cần FAL_KEY) hoặc PRESENTER=still (ảnh tĩnh, chạy thử)
+  case "${PRESENTER:-}" in
+    1) python3 "$root/render/presenter.py" "$json" >/dev/null ;;
+    still) python3 "$root/render/presenter.py" "$json" --still >/dev/null ;;
+  esac
 fi
 if [ "${COMP:-BangTinPro}" = "BangTinPro" ]; then
   # Tư liệu thật: logo/ảnh bìa nhà tuyển dụng (tin có "id" CareerViet) và cảnh quay nền (BROLL_SET=1 hoặc 2)

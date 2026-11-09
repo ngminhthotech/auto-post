@@ -11,6 +11,7 @@ import { BgVideoContext } from "../ui";
 import type { BangTinData, JobList } from "../types";
 import { Outro } from "../scenes/Outro";
 import { Hook } from "./Hook";
+import { PresenterScene } from "./PresenterScene";
 import { CompaniesScene } from "./CompaniesScene";
 import { IndustryScene } from "./IndustryScene";
 import { SalaryScene } from "./SalaryScene";
@@ -59,6 +60,8 @@ export const proScenes = (d: BangTinData): Scene[] => {
   if (focus) s.push({ key: "fl-safety", dur: 160, el: () => <FreelanceSafety /> });
   s.push({ key: "steps", dur: 180, el: () => <StepsScene /> });
   s.push({ key: "outro", dur: 170, el: () => <Outro data={d} />, subs: false });
+  // Có người dẫn chương trình: cảnh mở đầu là người dẫn nói lời chào thay cho cảnh số liệu
+  if (d.presenter) s[0] = { key: "presenter", dur: 110, el: () => <PresenterScene data={d} delay={VOICE_DELAY} /> };
   return s.map((x, i) => {
     const v = d.voice?.[i];
     return v ? { ...x, dur: Math.max(x.dur, VOICE_DELAY + Math.ceil(v.dur * FPS) + T + 14) } : x;
