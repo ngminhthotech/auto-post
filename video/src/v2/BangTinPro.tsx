@@ -60,7 +60,7 @@ export const proScenes = (d: BangTinData): Scene[] => {
   s.push({ key: "steps", dur: 180, el: () => <StepsScene /> });
   s.push({ key: "outro", dur: 170, el: () => <Outro data={d} />, subs: false });
   // Có người dẫn chương trình: cảnh mở đầu là người dẫn nói lời chào thay cho cảnh số liệu
-  if (d.presenter) s[0] = { key: "presenter", dur: 110, el: () => <PresenterScene data={d} delay={VOICE_DELAY} /> };
+  if (d.presenter) s[0] = { key: "presenter", dur: 110, el: (dur: number) => <PresenterScene data={d} delay={VOICE_DELAY} dur={dur} /> };
   return s.map((x, i) => {
     const v = d.voice?.[i];
     return v ? { ...x, dur: Math.max(x.dur, VOICE_DELAY + Math.ceil(v.dur * FPS) + T + 14) } : x;

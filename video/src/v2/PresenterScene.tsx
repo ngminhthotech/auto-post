@@ -4,6 +4,7 @@ import { Video } from "@remotion/media";
 import { C, FONT } from "../brand";
 import type { BangTinData } from "../types";
 import { ease } from "../ui";
+import { LowerThird } from "./LowerThird";
 
 // Mở đầu có người dẫn chương trình: video người nói khớp khẩu hình (render/presenter.py) phủ kín khung,
 // tiếng lấy từ voice[0] nên video để tắt tiếng. Trước khi người dẫn cất lời (VOICE_DELAY) giữ ảnh gốc.
@@ -11,7 +12,7 @@ import { ease } from "../ui";
 export const PRESENTER_NAME = "NGUYỄN HOÀI ANH";
 export const PRESENTER_TITLE = "CEO | FOUNDER DESIGN24";
 
-export const PresenterScene: React.FC<{ data: BangTinData; delay: number }> = ({ data, delay }) => {
+export const PresenterScene: React.FC<{ data: BangTinData; delay: number; dur: number }> = ({ data, delay, dur }) => {
   const frame = useCurrentFrame();
   const p = data.presenter!;
   const src = /^https?:/.test(p.src) ? p.src : staticFile(p.src);
@@ -20,9 +21,6 @@ export const PresenterScene: React.FC<{ data: BangTinData; delay: number }> = ({
   const zoom = interpolate(frame, [0, 600], [1, 1.05], { extrapolateRight: "clamp" });
   // Nhãn ngày trượt vào từ trái; băng chữ tên hiện sau khoảng 1 giây, kéo vạch cam rồi mở chữ
   const tag = ease(frame, 4, 20, [0, 1]);
-  const bar = ease(frame, 28, 46, [0, 1]);
-  const name = ease(frame, 40, 56, [0, 1]);
-  const role = ease(frame, 50, 66, [0, 1]);
   return (
     <AbsoluteFill style={{ fontFamily: FONT, color: "#fff", background: C.deep, overflow: "hidden" }}>
       <AbsoluteFill style={{ scale: String(zoom) }}>
@@ -45,20 +43,7 @@ export const PresenterScene: React.FC<{ data: BangTinData; delay: number }> = ({
         </div>
       </div>
 
-      {/* Băng chữ (lower third): tên và chức danh người dẫn */}
-      <div style={{ position: "absolute", left: 44, bottom: 250 }}>
-        <div style={{ display: "flex", alignItems: "stretch" }}>
-          <div style={{ width: 12, background: `linear-gradient(180deg, ${C.orange}, ${C.orange2})`, scale: `1 ${bar}`, transformOrigin: "bottom" }} />
-          <div style={{ overflow: "hidden" }}>
-            <div style={{ background: `linear-gradient(90deg, ${C.blue1}, ${C.blue2})`, padding: "14px 34px 10px 26px", fontSize: 56, fontWeight: 900, letterSpacing: 1.5, lineHeight: 1.1, translate: `${(1 - name) * -105}% 0`, boxShadow: "0 10px 30px rgba(0,0,0,.35)" }}>
-              {PRESENTER_NAME}
-            </div>
-            <div style={{ display: "inline-block", background: "#fff", color: C.navy, padding: "8px 26px", fontSize: 32, fontWeight: 800, letterSpacing: 2, translate: `${(1 - role) * -105}% 0` }}>
-              {PRESENTER_TITLE}
-            </div>
-          </div>
-        </div>
-      </div>
+      <LowerThird name={PRESENTER_NAME} title={PRESENTER_TITLE} start={26} end={dur - 10} />
     </AbsoluteFill>
   );
 };
