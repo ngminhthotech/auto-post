@@ -300,19 +300,19 @@ def script(d):
     focus = bool(fl.get("groups"))
     lines = []
     # Người dẫn chương trình (Hoài Anh) tự giới thiệu ở cảnh mở đầu
-    intro = ("Xin chào quý vị và các bạn, đến với kênh truyền hình việc làm Cần Thơ. "
-             "Tôi là Hoài Anh, đến từ Học viện Design24, nơi nghiên cứu và phát triển dự án này. "
-             "Bản tin Tìm Việc Số được cập nhật liên tục 24/7. "
+    intro = ("Xin chào quý vị và các bạn, chào mừng đến với kênh truyền hình việc làm Cần Thơ. "
+             "Tôi là Hoài Anh, đến từ Học viện Design24. "
+             "Bản tin Tìm Việc Số được cập nhật liên tục 24/7, mang đến cho bạn những cơ hội việc làm mới nhất. "
              f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, ")
     if focus:
         n = fl.get("total") or sum(g.get("total") or len(g["jobs"]) for g in fl["groups"])
         what = fl.get("say") or ("việc làm thêm" + (f" tại {fl['place']}" if fl.get("place") else ""))
-        lines.append(intro + f"bản tin dành cho sinh viên, với {n} {what}, cùng {total} việc làm toàn thời gian!")
+        lines.append(intro + f"bản tin dành cho các bạn sinh viên gồm {n} {what}, cùng {total} việc làm toàn thời gian.")
     elif fl.get("jobs"):
         # Có mục Freelancer: bỏ câu lương (đã hiện trên hình) để câu mở đầu vẫn dưới 300 ký tự (giới hạn của Vbee)
-        lines.append(intro + f"chúng tôi cập nhật {total} vị trí, và {count_word(len(fl['jobs'][:6]))} việc làm thêm cho sinh viên!")
+        lines.append(intro + f"bản tin gồm {total} vị trí tuyển dụng, cùng {count_word(len(fl['jobs'][:6]))} việc làm thêm dành cho sinh viên.")
     else:
-        lines.append(intro + f"chúng tôi cập nhật bản tin việc làm, gồm có {total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!")
+        lines.append(intro + f"bản tin gồm {total} vị trí tuyển dụng, với mức lương cao nhất lên đến {int(top)} triệu đồng một tháng.")
     if focus:
         lines += freelance_lines(d)
     else:
@@ -622,7 +622,7 @@ def main(argv=None):
     data["voice"] = []
     for i, line in enumerate(lines):
         f = folder / f"{i}.mp3"
-        # Câu mở đầu đọc liền một lượt: tách "Xin chào bạn!" ra đọc riêng thì giọng clone lên giọng
+        # Câu mở đầu đọc liền (dài quá thì tts tách theo câu): tách "Xin chào bạn!" ra đọc riêng thì giọng clone lên giọng
         # ở cuối câu cảm thán, chữ "chào" nghe thành "chao". Đọc liền thì "chào" xuống giọng đúng dấu huyền
         # và giọng vẫn tự nghỉ khoảng 0,27 giây sau "bạn,".
         tts(line, voice, f, a.speed)
