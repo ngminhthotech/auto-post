@@ -16,11 +16,16 @@
     "TP.HCM": "Thành phố Hồ Chí Minh",
     "Shorts": "sọt",
     "CH Play": "sê hắc lây",
-    "App Store": "áp sto",
+    "App Store": "áp, sơ-tô",
     "SIXDO": "Síc đô",
     "V.M.S": "vê em ét",
     "Sonacons": "Sô na con",
-    "CHPlay": "sê hắc lây"
+    "CHPlay": "sê hắc lây",
+    "Freelancer": "phri lan xơ",
+    "Freelance": "phri lan",
+    "Unilever": "Diu ni li vơ",
+    "AppStore": "áp, sơ-tô",
+    "part-time": "bán thời gian"
   },
   "dich": {
     "Quality Manager": "Quản lý chất lượng",
@@ -40,6 +45,9 @@
     "HVAC": "điều hòa thông gió",
     "BIM": "mô hình thông tin công trình",
     "IT": "công nghệ thông tin",
-    "Marketing": "ma két tinh"
+    "Marketing": "ma két tinh",
+    "Digital Marketing": "ma két tinh số",
+    "Software Tester": "kiểm thử phần mềm",
+    "Social Media": "mạng xã hội"
   }
 }

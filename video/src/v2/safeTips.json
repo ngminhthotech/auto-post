@@ -1,0 +1,22 @@
+[
+ {
+  "icon": "building",
+  "text": "Chọn tin có tên công ty và địa chỉ rõ ràng",
+  "say": "Chọn tin có tên công ty và địa chỉ rõ ràng."
+ },
+ {
+  "icon": "users",
+  "text": "Phỏng vấn trực tiếp tại văn phòng hoặc cửa hàng",
+  "say": "Ưu tiên phỏng vấn trực tiếp tại văn phòng, hoặc cửa hàng."
+ },
+ {
+  "icon": "file",
+  "text": "Đọc kỹ ca làm, mức lương và hợp đồng",
+  "say": "Đọc kỹ ca làm, mức lương, và hợp đồng trước khi nhận việc."
+ },
+ {
+  "icon": "idcard",
+  "text": "Giữ giấy tờ tùy thân bản gốc bên mình",
+  "say": "Luôn giữ giấy tờ tùy thân bản gốc bên mình."
+ }
+]

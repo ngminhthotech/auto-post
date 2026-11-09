@@ -90,7 +90,12 @@ def default_metadata(service, title=None, video=False):
     if service == "facebook":
         return {"facebook": {"type": "reel" if video else "post"}}
     if service == "tiktok":
-        return {"tiktok": {"title": title}} if title else None
+        # Giọng đọc là AI (Vbee) nên luôn gắn nhãn nội dung AI; TikTok gỡ hoặc hạn chế
+        # video dùng AI mà không gắn nhãn.
+        meta = {"isAiGenerated": True}
+        if title:
+            meta["title"] = title
+        return {"tiktok": meta}
     if service == "youtube":
         meta = {"categoryId": YOUTUBE_CATEGORY, "privacy": "public", "madeForKids": False}
         if title:
@@ -127,6 +132,36 @@ def create_post(channel_id, text, image_url=None, video_url=None, due_at=None, m
     return result["post"]
 
 
+# TikTok cảnh cáo tài khoản @timviecso.vn (06/11/2026) vì video bị đăng 2 lần: Buffer báo "kẹt sending"
+# nhưng bài đã lên TikTok, routine đăng lại thành video trùng. Khóa này chặn mọi bài TikTok thứ hai
+# trong TIKTOK_GAP_HOURS giờ, kể cả bài trước đang "sending" hay "error".
+TIKTOK_GAP_HOURS = 20
+RECENT_POSTS = """
+query($input: PostsInput!) {
+  posts(first: 10, input: $input) { edges { node { id status dueAt createdAt } } }
+}
+"""
+
+
+def tiktok_channel_ids():
+    try:
+        cfg = json.loads((Path(__file__).resolve().parent.parent / "channels.json").read_text(encoding="utf-8"))
+        return {cfg["tiktok"]["id"]}, cfg.get("organization")
+    except (OSError, KeyError, ValueError):
+        return set(), None
+
+
+def recent_tiktok_post(channel_id, org, hours=TIKTOK_GAP_HOURS):
+    """Bài TikTok gần nhất trong `hours` giờ (mọi trạng thái trừ nháp), hoặc None."""
+    from datetime import datetime, timedelta, timezone
+    since = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+    data = gql(RECENT_POSTS, {"input": {"organizationId": org, "filter": {
+        "channelIds": [channel_id], "status": ["sent", "sending", "scheduled", "error"],
+        "createdAt": {"start": since}}}})
+    edges = data["posts"]["edges"]
+    return edges[0]["node"] if edges else None
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="autopost.buffer")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -141,6 +176,8 @@ def main(argv=None):
     p.add_argument("--title", help="tiêu đề video (TikTok, YouTube)")
     p.add_argument("--metadata", help="JSON metadata tự đặt, ghi đè --service")
     p.add_argument("--draft", action="store_true", help="chỉ lưu nháp trong Buffer, không đăng")
+    p.add_argument("--allow-second-tiktok", action="store_true",
+                   help="chỉ dùng khi chủ dự án yêu cầu: bỏ khóa chặn bài TikTok thứ hai trong 20 giờ")
     args = parser.parse_args(argv)
 
     try:
@@ -154,6 +191,17 @@ def main(argv=None):
                 meta = default_metadata(args.service, args.title, video=bool(args.video_url))
             else:
                 meta = None
+            tiktok_ids, org = tiktok_channel_ids()
+            if args.service == "tiktok" or args.channel in tiktok_ids:
+                meta = meta or {"tiktok": {}}
+                meta.setdefault("tiktok", {})["isAiGenerated"] = True
+                if not args.draft and not args.allow_second_tiktok and org:
+                    prev = recent_tiktok_post(args.channel, org)
+                    if prev:
+                        raise BufferError(
+                            f"KHÔNG ĐĂNG: kênh TikTok đã có bài {prev['id']} ({prev['status']}) trong {TIKTOK_GAP_HOURS} giờ qua. "
+                            "Bài 'sending' hay 'error' thường đã lên TikTok; đăng lại sẽ thành video trùng và bị cảnh cáo. "
+                            "Ghi vào báo cáo, không thử lại.")
             out = {"post": create_post(args.channel, text, args.image_url, args.video_url, args.at, meta, args.draft)}
     except BufferError as exc:
         print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False))

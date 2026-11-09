@@ -1,15 +1,40 @@
 # Hướng dẫn cho routine
 
-## Routine bản tin video (7:00 mỗi sáng, từ 28/10/2026)
+## Chạy không bị hỏi quyền (bắt buộc cho mọi routine, từ 08/11/2026)
 
-Một video bản tin mỗi ngày, đăng 7:00 (giờ Việt Nam) lên Facebook, TikTok @timviecso.vn và YouTube qua Buffer (id kênh trong `channels.json`).
+Routine chạy không có người ngồi bấm "Cho phép". Lệnh lạ hoặc lệnh ghép dài sẽ bị dừng chờ duyệt hàng giờ. Các lệnh `python3 -m autopost.*`, `render/video.sh`, `python3 render/voice.py`, `ffmpeg`, `git fetch/checkout` đã được cho phép sẵn trong `.claude/settings.json`. Vì vậy:
 
-1. Lấy khoảng 20 tin mới, còn hạn trên CareerViet (`autopost/careerviet.py`): ưu tiên Cần Thơ, rồi các tỉnh ĐBSCL (ô miền Tây, tối đa 4 tỉnh), rồi TP.HCM. Bỏ tin công ty ẩn danh, thu phí, sai khu vực. Ghi JSON bảng tin theo `examples/bangtin-mau.json`, mỗi tin có `id` CareerViet, `co` ghi đủ loại hình công ty.
-2. `render/video.sh <json> out/video.mp4 --voice`. Kiểm tra lời đọc bằng `python3 render/voice.py <json> --dry-run`: mở đầu "Xin chào bạn, đến với bản tin Tìm Việc Số, được cập nhật liên tục 24/7. Dự án này được nghiên cứu và phát triển tại Học viện Design24. Hôm nay, ngày D, tháng M, năm Y, ..." (chỉ nói ngày, không nói giờ); không nhắc App Store; CH Play đọc "sê hắc lây"; câu mở đầu đọc liền một lượt (tách "Xin chào bạn" ra đọc riêng thì "chào" nghe thành "chao"). Video phải dài ít nhất 90 giây, có đủ TP.HCM. Video không có mã QR, số điện thoại, email trên hình, lời đọc cũng không đọc số điện thoại. Xem vài khung hình trước khi đăng.
-3. Nén: bản chính `-crf 28 -maxrate 1.0M`; bản TikTok `-crf 30 -maxrate 0.7M` (khoảng 13 MB). Tải lên bằng `python3 -m autopost.media <file...> --folder <ngày>`.
-4. Chú thích: không viết "quét mã QR". TikTok không có số điện thoại, đường link hay lời mời nhắn Zalo, chỉ ghi "timviecso.vn hoặc app Tìm Việc Số trên CH Play" và 4 đến 6 hashtag. Facebook và YouTube giữ khối liên hệ dạng chữ.
-5. Đăng (hẹn `--at` 7:00 nếu còn kịp, không thì đăng ngay): Facebook dùng `--metadata '{"facebook":{"type":"post"}}'` (Reels chỉ nhận ≤90 giây); TikTok `--service tiktok --title`; YouTube `--service youtube --title "... #Shorts"`.
-6. Lưu bài vào `/mnt/project-files/auto-post/bai-<ngày>-0700/` nếu có thư mục đó; ghi dòng mới vào tab `Lich dang` của sheet "Lich dang" (id, link, trạng thái). Kênh lỗi: ghi lỗi, không đăng lại quá 2 lần.
+- Mỗi lần gọi Bash chỉ chạy MỘT lệnh có sẵn ở trên (được thêm `2>&1 | tail -N`). Không ghép `cd ...;`, `&&`, `;`, `$(...)`, biến shell, vòng lặp. Thư mục làm việc luôn là gốc repo, dùng đường dẫn tương đối `out/...`.
+- Viết file (JSON bảng tin, chú thích, tiêu đề) bằng công cụ Write/Edit, KHÔNG dùng `cat > file <<'EOF'`, `echo > file` hay `python3 - <<'EOF'`.
+- Không tự viết đoạn Python gọi API (`python3 -c "from autopost import ..."`): dùng lệnh có sẵn, ví dụ `python3 -m autopost.bantin trangthai out`.
+- Không xóa file bằng `rm`; ghi đè file thì dùng Write.
+- Nếu một lệnh vẫn bị chặn: không thử lách, làm tiếp phần còn lại, cuối cùng báo "⚠️ CẦN XỬ LÝ:" kèm đúng lệnh bị chặn.
+
+## Routine bản tin video (7:00 mỗi sáng, luồng chuẩn từ 02/11/2026)
+
+
+Một video bản tin mỗi ngày, đăng 7:00 (giờ Việt Nam) lên Facebook, TikTok @timviecso.vn và YouTube qua Buffer (id kênh trong `channels.json`). Bản mẫu chuẩn: `/mnt/project-files/auto-post/bai-2026-11-01-1706/` (video, `bangtin.json`, chú thích).
+
+Thứ tự video (không đảo, không trộn vùng): mở đầu sinh viên → tổng quan việc làm bán thời gian Cần Thơ → Thực tập → Part-time theo ca → Cộng tác viên → việc làm toàn thời gian Cần Thơ → Đồng bằng sông Cửu Long → TP. Hồ Chí Minh → làm thêm an toàn → ứng tuyển thế nào → kết. Không có cảnh lương cao nhất, nhà tuyển dụng, ngành, sắp hết hạn (các cảnh này trộn nhiều vùng).
+
+1. Việc làm bán thời gian Cần Thơ (phần chính): `python3 -m autopost.sinhvien --out out/sinhvien.json` gom tin từ vieclamcantho.com.vn (mục Bán thời gian, Thực tập) và vieclam24h.vn (tin Cần Thơ), đã bỏ tin hết hạn, ngoài Cần Thơ, đăng chung nhiều tỉnh, bảo hiểm, tài chính, trả góp, bất động sản, đòi phí. Mở tin gốc của các tin định đưa lên video để kiểm tra. Ghi `freelance` theo bản mẫu: `name` "Việc làm bán thời gian Cần Thơ", `label` "VIỆC LÀM BÁN THỜI GIAN", `say` "việc làm bán thời gian tại Cần Thơ", `place` "Cần Thơ", `total`, `stats` (số tin từng nhóm), `payNote`, 3 `groups` (Thực tập, Part-time theo ca, Cộng tác viên), mỗi nhóm tối đa 6 tin có `tag`, `area` "Cần Thơ", `note` (ca làm, phụ cấp, yêu cầu ngắn), và 4 `tips` an toàn. Tất cả việc bán thời gian đều phải ở Cần Thơ.
+2. Việc làm toàn thời gian (khoảng 20 tin mới, còn hạn trên CareerViet, `autopost/careerviet.py`): danh sách CẦN THƠ, ô miền Tây (tối đa 4 tỉnh ĐBSCL), danh sách TP. HỒ CHÍ MINH; `sub` của danh sách và ô ghi "Việc làm toàn thời gian". Bỏ tin công ty ẩn danh, thu phí, sai khu vực. Mỗi tin có `id` CareerViet, `co` ghi đủ loại hình công ty.
+3. `python3 render/voice.py <json> --dry-run` rồi `render/video.sh <json> out/video.mp4 --voice`. Lời đọc: mở đầu "Xin chào bạn, đến với bản tin Tìm Việc Số, được cập nhật liên tục 24/7. Dự án này được nghiên cứu và phát triển tại Học viện Design24. Hôm nay, ngày D, tháng M, năm Y, ..." (chỉ nói ngày, không nói giờ, đọc liền một lượt); vùng đọc theo thứ tự "Việc làm toàn thời gian tại Cần Thơ", "Tiếp theo, Đồng bằng sông Cửu Long", "Cuối cùng, Thành phố Hồ Chí Minh". Ứng dụng chỉ nói một lần ở câu kết: "Ứng dụng Tìm Việc Số đã có trên Android và iOS" (để nguyên chữ, không phiên âm; không nói "CH Play", "App Store"). Video dài 90 đến 180 giây (YouTube Shorts tối đa 180 giây). Video không có mã QR, số điện thoại, email trên hình, lời đọc không đọc số điện thoại. Xem khung hình từng cảnh trước khi đăng.
+4. Nén và xem khung hình: `python3 -m autopost.bantin nen out/video.mp4` (bản chính `-crf 28 -maxrate 1.0M` thành `out/video-main.mp4`, bản TikTok `-crf 30 -maxrate 0.7M` thành `out/video-tiktok.mp4`, 18 khung hình trong `out/khung.png`, in độ dài). Mở `out/khung.png` bằng Read để xem.
+5. Chú thích theo bản mẫu: Facebook liệt kê việc bán thời gian Cần Thơ theo nhóm trước, rồi "Làm thêm an toàn", rồi việc toàn thời gian theo thứ tự Cần Thơ, Miền Tây, TP.HCM, cách ứng tuyển, khối liên hệ dạng chữ, nguồn, hashtag. TikTok không có số điện thoại, đường link hay lời mời nhắn Zalo, chỉ ghi "timviecso.vn hoặc app Tìm Việc Số trên Android và iOS" và 4 đến 6 hashtag. Không viết "quét mã QR". TikTok (từ 06/11/2026, sau khi nhiều video bị gắn "Vi phạm Nguyên tắc Cộng đồng"): trường `cta` trong JSON không dùng "Inbox", "nhắn tin", "link" (dùng "Xem chi tiết tại timviecso.vn"); không dùng hashtag #vieclamthem #parttime #kiemtienonline; bài TikTok luôn gắn nhãn AI (`isAiGenerated`, `autopost.buffer` tự thêm).
+6. Viết bằng Write vào `out/`: `caption-facebook.txt`, `caption-tiktok.txt`, `tiktok-tieude.txt`, `youtube-tieude.txt` (có #Shorts), `youtube-mota.txt`. Rồi đăng cả 3 kênh bằng MỘT lệnh: `python3 -m autopost.bantin dang out --date <yyyy-mm-dd>`. Lệnh tự tải video lên, hẹn 7:00 nếu còn kịp (không thì đăng ngay), ghi `out/ket-qua-<kênh>.json`, lưu thư mục bài vào `/mnt/project-files/auto-post/bai-<ngày>-0700/`, và không bao giờ đăng lại kênh đã đăng (TikTok đã thử thì không thử lại). Khoảng 10 phút sau giờ đăng: `python3 -m autopost.bantin trangthai out`. Cách đăng bên trong (chỉ để tham khảo): Facebook dùng `--metadata '{"facebook":{"type":"post"}}'` (Reels chỉ nhận ≤90 giây); TikTok `--service tiktok --title`; YouTube `--service youtube --title "... #Shorts"`. **TikTok KHÔNG BAO GIỜ đăng lại cùng một video trong ngày**, kể cả khi Buffer báo kẹt "sending" hay lỗi: ngày 03/11 và 05/11 bài "kẹt" thật ra đã lên TikTok, lần thử lại tạo video trùng và TikTok cảnh cáo tài khoản (06/11/2026, thêm 3 cảnh cáo có thể bị cấm). TikTok kẹt thì chỉ ghi vào báo cáo, không thử lại, không xóa rồi đăng lại.
+7. Bài đã được lưu ở bước 6 (chạy lại riêng: `python3 -m autopost.bantin luu out --date <ngày>`); ghi dòng mới vào tab `Lich dang` của sheet "Lich dang" (id, link, trạng thái). Kênh lỗi: ghi lỗi, không đăng lại quá 2 lần.
+
+### Nội dung an toàn (bắt buộc cho mọi video và chú thích, từ 06/11/2026)
+
+Tài khoản TikTok @timviecso.vn đã bị cảnh cáo (thêm 3 lần có thể bị cấm). Tránh mọi thứ khiến video bị xếp vào nhóm lừa đảo việc làm, spam hoặc bị giảm hiển thị; thay bằng cách nói tích cực:
+
+- Không nói, không ghi các từ: phí, đặt cọc, chuyển tiền/chuyển khoản, nạp tiền, nhiệm vụ, hoa hồng, lừa đảo, kiếm tiền, việc nhẹ lương cao, Inbox, nhắn tin, Zalo, tại nhà, online, làm từ xa. Thay "không thu phí" bằng "tin có tên công ty, địa chỉ rõ ràng"; thay cảnh "Làm thêm an toàn" bằng "Mẹo ứng tuyển" (mẫu tự dùng `video/src/v2/safeTips.json`, không cần viết `tips`). `render/voice.py` tự dừng nếu lời đọc còn các từ này: sửa JSON rồi chạy lại, không lách bằng cách viết sai chính tả.
+- Bỏ hẳn tin online, tại nhà, cần laptop, làm từ xa (`autopost.sinhvien` đã tự lọc); không đưa tin không có tên công ty.
+- Lời mời cuối chỉ là "Xem chi tiết tại timviecso.vn"; không kêu gọi nhắn tin, gọi điện, quét mã, bấm link.
+- Chú thích TikTok: 1 đến 2 câu mô tả bản tin (số việc, khu vực), không ghi mức lương theo giờ, không ghi "không đóng phí", không biểu tượng ⚠️, 4 đến 5 hashtag trung tính như #sinhviencantho #vieclamcantho #timviecso #huongnghiep #cantho (không #vieclamthem #parttime #kiemtienonline #vieclamonline).
+- Mỗi ngày chỉ 1 video TikTok; không đăng lại, kể cả khi Buffer báo kẹt. `autopost.buffer post` tự chặn bài TikTok thứ hai trong 20 giờ (báo "KHÔNG ĐĂNG"): gặp lỗi này thì ghi vào báo cáo, không tìm cách lách. Không xóa bài TikTok trên Buffer rồi đăng lại.
+- Bài TikTok luôn gắn nhãn AI (`isAiGenerated`, `autopost.buffer` tự thêm).
 
 ## Routine soạn bài (20:00 mỗi tối)
 
