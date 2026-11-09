@@ -301,17 +301,18 @@ def script(d):
     lines = []
     # Người dẫn chương trình (Hoài Anh) tự giới thiệu ở cảnh mở đầu
     intro = ("Xin chào quý vị và các bạn, đến với kênh truyền hình việc làm Cần Thơ. "
-             "Tôi là Hoài Anh, đến từ Học viện Design24. "
-             f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, bản tin Tìm Việc Số gồm có ")
+             "Tôi là Hoài Anh, đến từ Học viện Design24, nơi nghiên cứu và phát triển dự án này. "
+             "Bản tin Tìm Việc Số được cập nhật liên tục 24/7. "
+             f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, ")
     if focus:
         n = fl.get("total") or sum(g.get("total") or len(g["jobs"]) for g in fl["groups"])
         what = fl.get("say") or ("việc làm thêm" + (f" tại {fl['place']}" if fl.get("place") else ""))
-        lines.append(intro + f"{n} {what}, cùng {total} việc làm toàn thời gian!")
+        lines.append(intro + f"bản tin dành cho sinh viên, với {n} {what}, cùng {total} việc làm toàn thời gian!")
     elif fl.get("jobs"):
         # Có mục Freelancer: bỏ câu lương (đã hiện trên hình) để câu mở đầu vẫn dưới 300 ký tự (giới hạn của Vbee)
-        lines.append(intro + f"{total} vị trí, và {count_word(len(fl['jobs'][:6]))} việc làm thêm cho sinh viên!")
+        lines.append(intro + f"chúng tôi cập nhật {total} vị trí, và {count_word(len(fl['jobs'][:6]))} việc làm thêm cho sinh viên!")
     else:
-        lines.append(intro + f"{total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!")
+        lines.append(intro + f"chúng tôi cập nhật bản tin việc làm, gồm có {total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!")
     if focus:
         lines += freelance_lines(d)
     else:
@@ -497,6 +498,32 @@ def tts_legacy(text, voice, path, speed=1.0):
 
 
 def tts(text, voice, path, speed=1.0):
+    """Câu dài quá giới hạn của Vbee (câu mở đầu có người dẫn tự giới thiệu): tách theo dấu chấm thành nhiều đoạn
+    dưới MAX_CHARS, đọc từng đoạn rồi nối lại thành một file."""
+    if len(text) <= MAX_CHARS - 5:
+        return tts_one(text, voice, path, speed)
+    chunks, cur = [], ""
+    for sent in re.split(r"(?<=[.!?])\s+", text):
+        if cur and len(cur) + 1 + len(sent) > MAX_CHARS - 5:
+            chunks.append(cur)
+            cur = sent
+        else:
+            cur = f"{cur} {sent}".strip()
+    chunks.append(cur)
+    parts = []
+    for i, c in enumerate(chunks):
+        part = path.with_name(f"{path.stem}.part{i}{path.suffix}")
+        tts_one(c, voice, part, speed)
+        parts.append(part)
+    inputs = sum((["-i", str(p)] for p in parts), [])
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", *inputs, "-filter_complex",
+                    "".join(f"[{i}:a]" for i in range(len(parts))) + f"concat=n={len(parts)}:v=0:a=1",
+                    "-c:a", "libmp3lame", "-b:a", "128k", str(path)], check=True)
+    for p in parts:
+        p.unlink()
+
+
+def tts_one(text, voice, path, speed=1.0):
     """Thử Realtime API; giọng nào Realtime báo không có (thường là giọng clone) thì chuyển sang Batch, rồi API cũ."""
     last = None
     for attempt in range(1, 4):
