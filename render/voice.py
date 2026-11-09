@@ -299,18 +299,19 @@ def script(d):
     fl = d.get("freelance") or {}
     focus = bool(fl.get("groups"))
     lines = []
-    intro = ("Xin chào bạn, đến với bản tin Tìm Việc Số, được cập nhật liên tục 24/7. "
-             "Dự án này được nghiên cứu và phát triển tại Học viện Design24. "
-             f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, ")
+    # Người dẫn chương trình (Hoài Anh) tự giới thiệu ở cảnh mở đầu
+    intro = ("Xin chào quý vị và các bạn, đến với kênh truyền hình việc làm Cần Thơ. "
+             "Tôi là Hoài Anh, đến từ Học viện Design24. "
+             f"Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, bản tin Tìm Việc Số gồm có ")
     if focus:
         n = fl.get("total") or sum(g.get("total") or len(g["jobs"]) for g in fl["groups"])
         what = fl.get("say") or ("việc làm thêm" + (f" tại {fl['place']}" if fl.get("place") else ""))
-        lines.append(intro + f"bản tin dành cho sinh viên, với {n} {what}, cùng {total} việc làm toàn thời gian!")
+        lines.append(intro + f"{n} {what}, cùng {total} việc làm toàn thời gian!")
     elif fl.get("jobs"):
         # Có mục Freelancer: bỏ câu lương (đã hiện trên hình) để câu mở đầu vẫn dưới 300 ký tự (giới hạn của Vbee)
-        lines.append(intro + f"chúng tôi cập nhật bản tin việc làm, gồm có {total} vị trí, và {count_word(len(fl['jobs'][:6]))} việc làm thêm cho sinh viên!")
+        lines.append(intro + f"{total} vị trí, và {count_word(len(fl['jobs'][:6]))} việc làm thêm cho sinh viên!")
     else:
-        lines.append(intro + f"chúng tôi cập nhật bản tin việc làm, gồm có {total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!")
+        lines.append(intro + f"{total} vị trí. Lương cao nhất, lên đến {int(top)} triệu đồng một tháng!")
     if focus:
         lines += freelance_lines(d)
     else:
