@@ -4,7 +4,7 @@ import { Video } from "@remotion/media";
 import { C, FONT } from "../brand";
 import type { BangTinData } from "../types";
 import { ease } from "../ui";
-import { LowerThird } from "./LowerThird";
+import { LowerThird, ProjectCredit } from "./LowerThird";
 
 // Mở đầu có người dẫn chương trình: video người nói khớp khẩu hình (render/presenter.py) phủ kín khung,
 // tiếng lấy từ voice[0] nên video để tắt tiếng. Trước khi người dẫn cất lời (VOICE_DELAY) giữ ảnh gốc.
@@ -43,7 +43,9 @@ export const PresenterScene: React.FC<{ data: BangTinData; delay: number; dur: n
         </div>
       </div>
 
-      <LowerThird name={PRESENTER_NAME} title={PRESENTER_TITLE} start={26} end={dur - 10} />
+      {/* Tên người dẫn khoảng 4 giây đầu, sau đó là khung ghi công dự án đến hết cảnh */}
+      <LowerThird name={PRESENTER_NAME} title={PRESENTER_TITLE} start={26} end={Math.min(170, dur - 40)} />
+      <ProjectCredit start={Math.min(176, dur - 34)} end={dur - 8} />
     </AbsoluteFill>
   );
 };
