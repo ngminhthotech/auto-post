@@ -20,7 +20,6 @@ import { WestScene } from "./WestScene";
 import { StepsScene } from "./StepsScene";
 import { DeadlineScene, soonJobs } from "./DeadlineScene";
 import { FreelanceHook, FreelanceOverview, FreelanceSafety, FreelanceScene } from "./FreelanceScene";
-import { Subtitles } from "./Subtitles";
 
 export const FPS = 30;
 const T = 18;
@@ -133,7 +132,6 @@ export const BangTinPro: React.FC<BangTinData> = (data) => {
       {(data.voice ?? []).slice(0, s.length).map((v, i) => (
         <Sequence key={`v${i}`} from={starts[i] + VOICE_DELAY} durationInFrames={Math.ceil(v.dur * FPS) + 10}>
           <Audio src={staticFile(v.src)} volume={1} />
-          {s[i].subs !== false && v.text && <Subtitles text={v.text} dur={v.dur} />}
         </Sequence>
       ))}
     </AbsoluteFill>

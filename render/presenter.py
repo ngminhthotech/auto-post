@@ -6,7 +6,7 @@ Dịch vụ (PRESENTER_SERVICE, mặc định topview nếu có TOPVIEW_API_KEY,
   credit lấy từ gói Basic/Plus/Pro/Business (gói Unlimited/Ultra/Team không dùng được cho API). Khoảng 0,1 credit/giây.
 - fal: fal.ai (hàng đợi queue.fal.run), biến FAL_KEY. Mô hình mặc định Kling AI Avatar v2 Pro; đổi bằng PRESENTER_MODEL.
 Video trả về được cắt cho đúng khổ dọc 1080x1920.
-Video có gắn nhãn nội dung AI trên hình (xem video/src/v2/PresenterScene.tsx).
+Cảnh người dẫn: video/src/v2/PresenterScene.tsx (nhãn ngày góc trên trái, băng chữ tên người dẫn).
 
 Cách dùng:
   python3 render/presenter.py props.json                       # dùng assets/nguoi-dan.jpg, ghi đè props.json
