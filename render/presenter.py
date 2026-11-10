@@ -1,8 +1,9 @@
 """Người dẫn chương trình cho cảnh mở đầu bản tin: dựng video người nói khớp khẩu hình từ một ảnh tĩnh
 và lời đọc mở đầu (voice[0] do render/voice.py tạo), rồi gắn trường "presenter" vào props của BangTinPro.
 
-Dịch vụ (PRESENTER_SERVICE, mặc định topview nếu có TOPVIEW_API_KEY, ngược lại fal):
-- topview: Topview Photo Avatar (Avatar 4). Cần TOPVIEW_API_KEY và TOPVIEW_UID (mục API Settings trong tài khoản Topview),
+Dịch vụ (PRESENTER_SERVICE, mặc định topview):
+- topview: Topview Photo Avatar (Avatar 4). Khóa: Network secret cho api.topview.ai (tiêu đề Authorization: Bearer <API Key>
+  và Topview-Uid: <UID>), hoặc biến TOPVIEW_API_KEY và TOPVIEW_UID (mục API Settings trong tài khoản Topview),
   credit lấy từ gói Basic/Plus/Pro/Business (gói Unlimited/Ultra/Team không dùng được cho API). Khoảng 0,1 credit/giây.
 - fal: fal.ai (hàng đợi queue.fal.run), biến FAL_KEY. Mô hình mặc định Kling AI Avatar v2 Pro; đổi bằng PRESENTER_MODEL.
 Video trả về được cắt cho đúng khổ dọc 1080x1920.
@@ -86,7 +87,11 @@ TOPVIEW = "https://api.topview.ai/v1"
 
 def tv_headers():
     # Khóa có thể do proxy môi trường tự chèn (Network secrets cho api.topview.ai): khi đó gửi khóa giả, proxy thay bằng khóa thật
-    return {"Authorization": f"Bearer {os.environ.get('TOPVIEW_API_KEY') or 'proxy'}", "Topview-Uid": os.environ["TOPVIEW_UID"]}
+    # (Authorization và Topview-Uid); có biến môi trường thì dùng biến môi trường.
+    h = {"Authorization": f"Bearer {os.environ.get('TOPVIEW_API_KEY') or 'proxy'}"}
+    if os.environ.get("TOPVIEW_UID"):
+        h["Topview-Uid"] = os.environ["TOPVIEW_UID"]
+    return h
 
 
 def tv_ok(r, what):
@@ -160,7 +165,7 @@ def main(argv=None):
     p.add_argument("--out", help="ghi props mới ra file khác (mặc định ghi đè)")
     p.add_argument("--still", action="store_true", help="không gọi dịch vụ, dùng ảnh tĩnh chuyển động nhẹ")
     p.add_argument("--auto", action="store_true",
-                   help="dùng cho routine: có TOPVIEW_UID thì gọi Topview, lỗi hoặc chưa cấu hình thì dùng ảnh tĩnh (in CẢNH BÁO)")
+                   help="dùng cho routine: gọi Topview, lỗi thì dùng ảnh tĩnh (in CẢNH BÁO)")
     p.add_argument("--video", help="video người dẫn có sẵn (làm tay trên Topview); không có file thì dùng ảnh tĩnh")
     a = p.parse_args(argv)
     data = json.loads(Path(a.props).read_text(encoding="utf-8"))
@@ -178,13 +183,12 @@ def main(argv=None):
     elif a.still:
         still(a.image, audio, out)
     else:
-        service = os.environ.get("PRESENTER_SERVICE") or ("topview" if os.environ.get("TOPVIEW_UID") or os.environ.get("TOPVIEW_API_KEY") else "fal")
+        # Mặc định Topview (khóa do proxy môi trường chèn cho api.topview.ai); PRESENTER_SERVICE=fal để dùng fal.ai
+        service = os.environ.get("PRESENTER_SERVICE") or "topview"
         raw = out.with_suffix(".raw.mp4")
         try:
-            if a.auto and service == "topview" and not os.environ.get("TOPVIEW_UID"):
-                raise SystemExit("chưa có TOPVIEW_UID trong môi trường")
-            if a.auto and service == "fal" and not os.environ.get("FAL_KEY"):
-                raise SystemExit("chưa cấu hình Topview (TOPVIEW_UID) hay fal.ai (FAL_KEY)")
+            if service == "fal" and not os.environ.get("FAL_KEY"):
+                raise SystemExit("chưa có FAL_KEY")
             (topview if service == "topview" else fal)(a.image, audio, raw)
             to_vertical(raw, out)
         except (SystemExit, Exception) as e:

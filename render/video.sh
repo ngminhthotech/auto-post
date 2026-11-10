@@ -2,7 +2,7 @@
 # Dựng video động thương hiệu D24 (Remotion, mẫu BangTinPro; COMP=BangTin để dùng mẫu cũ) từ JSON bảng tin, có nhạc nền, chuẩn âm lượng -14 LUFS.
 # Cách dùng: render/video.sh examples/bangtin-mau.json out/video.mp4 [--voice]
 #   --voice: thêm giọng đọc Vbee (cần khóa Vbee trong môi trường, xem render/voice.py)
-#   render/video.sh <json> out/video.mp4 --voice --presenter: người dẫn Topview (TOPVIEW_UID + khóa), lỗi thì ảnh tĩnh
+#   render/video.sh <json> out/video.mp4 --voice --presenter: người dẫn Topview (Network secret api.topview.ai), lỗi thì ảnh tĩnh
 #   PRESENTER=1 render/video.sh ... --voice: mở đầu bằng người dẫn chương trình nói từ ảnh assets/nguoi-dan.jpg (render/presenter.py)
 set -euo pipefail
 json="$(realpath "$1")"; out="$(realpath -m "$2")"; voice="${3:-}"
