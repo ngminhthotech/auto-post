@@ -35,4 +35,6 @@ export type BangTinData = {
   voice?: { src: string; dur: number; text?: string }[];
   // Cảnh quay thật làm nền từng cảnh (đường dẫn trong video/public, dur = độ dài clip, giây)
   broll?: { src: string; dur: number }[];
+  // Người dẫn chương trình ở cảnh mở đầu (render/presenter.py): video khớp khẩu hình và ảnh gốc làm khung chờ
+  presenter?: { src: string; dur: number; poster?: string };
 };

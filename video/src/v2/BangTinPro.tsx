@@ -11,6 +11,7 @@ import { BgVideoContext } from "../ui";
 import type { BangTinData, JobList } from "../types";
 import { Outro } from "../scenes/Outro";
 import { Hook } from "./Hook";
+import { PresenterScene } from "./PresenterScene";
 import { CompaniesScene } from "./CompaniesScene";
 import { IndustryScene } from "./IndustryScene";
 import { SalaryScene } from "./SalaryScene";
@@ -19,7 +20,6 @@ import { WestScene } from "./WestScene";
 import { StepsScene } from "./StepsScene";
 import { DeadlineScene, soonJobs } from "./DeadlineScene";
 import { FreelanceHook, FreelanceOverview, FreelanceSafety, FreelanceScene } from "./FreelanceScene";
-import { Subtitles } from "./Subtitles";
 
 export const FPS = 30;
 const T = 18;
@@ -59,6 +59,8 @@ export const proScenes = (d: BangTinData): Scene[] => {
   if (focus) s.push({ key: "fl-safety", dur: 160, el: () => <FreelanceSafety /> });
   s.push({ key: "steps", dur: 180, el: () => <StepsScene /> });
   s.push({ key: "outro", dur: 170, el: () => <Outro data={d} />, subs: false });
+  // Có người dẫn chương trình: cảnh mở đầu là người dẫn nói lời chào thay cho cảnh số liệu
+  if (d.presenter) s[0] = { key: "presenter", dur: 110, el: (dur: number) => <PresenterScene data={d} delay={VOICE_DELAY} dur={dur} /> };
   return s.map((x, i) => {
     const v = d.voice?.[i];
     return v ? { ...x, dur: Math.max(x.dur, VOICE_DELAY + Math.ceil(v.dur * FPS) + T + 14) } : x;
@@ -130,7 +132,6 @@ export const BangTinPro: React.FC<BangTinData> = (data) => {
       {(data.voice ?? []).slice(0, s.length).map((v, i) => (
         <Sequence key={`v${i}`} from={starts[i] + VOICE_DELAY} durationInFrames={Math.ceil(v.dur * FPS) + 10}>
           <Audio src={staticFile(v.src)} volume={1} />
-          {s[i].subs !== false && v.text && <Subtitles text={v.text} dur={v.dur} />}
         </Sequence>
       ))}
     </AbsoluteFill>
