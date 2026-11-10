@@ -72,7 +72,7 @@ export const LowerThird: React.FC<{ name: string; title: string; kicker?: string
   );
 };
 
-// Khung ghi công dự án (trọng tâm của cảnh mở đầu): logo Design24 và dòng
+// Khung ghi công dự án (trọng tâm của cảnh mở đầu): logo Tìm Việc Số và dòng
 // "Dự án được nghiên cứu và phát triển bởi HỌC VIỆN DESIGN24", căn giữa phía dưới khung hình.
 export const ProjectCredit: React.FC<{ start: number; end: number }> = ({ start, end }) => {
   const frame = useCurrentFrame();
@@ -94,9 +94,8 @@ export const ProjectCredit: React.FC<{ start: number; end: number }> = ({ start,
         background: "linear-gradient(135deg, rgba(6,20,80,.92) 0%, rgba(10,42,140,.9) 60%, rgba(11,134,232,.85) 100%)",
         boxShadow: `0 30px 70px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.22), 0 0 ${40 + 30 * pulse}px rgba(11,134,232,.45)` }}>
         <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 4, background: `linear-gradient(90deg, ${C.orange}, ${C.orange2}, rgba(255,162,63,0))` }} />
-        <div style={{ flex: "none", position: "relative", width: 180, height: 180, borderRadius: 30, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 14px 30px rgba(0,0,0,.4)", scale: String(logo), rotate: `${(1 - logo) * 14}deg` }}>
-          <Img src={staticFile("logo-d24.png")} style={{ width: 134 }} />
-          <div style={{ position: "absolute", inset: 0, borderRadius: 30, boxShadow: `inset 0 0 0 4px ${C.orange}` }} />
+        <div style={{ flex: "none", width: 180, height: 180, display: "flex", alignItems: "center", justifyContent: "center", scale: String(logo), rotate: `${(1 - logo) * 14}deg` }}>
+          <Img src={staticFile("logo-tvs.png")} style={{ width: 190, filter: "drop-shadow(0 14px 22px rgba(0,0,0,.45))" }} />
         </div>
         <div style={{ flex: 1, color: "#fff" }}>
           <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: 6, color: C.orange2, opacity: l1, translate: `0 ${(1 - l1) * 20}px` }}>BẢN TIN TÌM VIỆC SỐ</div>
