@@ -14,10 +14,11 @@ if [ "$voice" = "--voice" ]; then
   style=pro; [ "${COMP:-BangTinPro}" = "BangTin" ] && style=basic
   python3 "$root/render/voice.py" "$json" --style "$style" --out "$tmp/props.json" >/dev/null
   json="$tmp/props.json"
-  # Người dẫn chương trình ở cảnh mở đầu: PRESENTER=1 (fal.ai, cần FAL_KEY) hoặc PRESENTER=still (ảnh tĩnh, chạy thử)
+  # Người dẫn chương trình ở cảnh mở đầu: PRESENTER=1 (Topview API nếu có TOPVIEW_API_KEY, không thì fal.ai), PRESENTER=<file.mp4> (video làm tay trên Topview) hoặc PRESENTER=still (ảnh tĩnh)
   case "${PRESENTER:-}" in
     1) python3 "$root/render/presenter.py" "$json" >/dev/null ;;
     still) python3 "$root/render/presenter.py" "$json" --still >/dev/null ;;
+    *.mp4) python3 "$root/render/presenter.py" "$json" --video "$(realpath -m "$PRESENTER")" >/dev/null ;;
   esac
 fi
 if [ "${COMP:-BangTinPro}" = "BangTinPro" ]; then

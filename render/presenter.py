@@ -12,6 +12,7 @@ Cách dùng:
   python3 render/presenter.py props.json                       # dùng assets/nguoi-dan.jpg, ghi đè props.json
   python3 render/presenter.py props.json --image anh.png
   python3 render/presenter.py props.json --still               # không gọi dịch vụ: ảnh tĩnh chuyển động nhẹ (chạy thử bố cục)
+  python3 render/presenter.py props.json --video topview.mp4   # dùng video người dẫn đã làm tay trên Topview (cùng lời đọc voice[0])
 """
 import argparse
 import base64
@@ -155,7 +156,8 @@ def main(argv=None):
     p.add_argument("props", help="props JSON đã có voice (render/voice.py)")
     p.add_argument("--image", default=str(IMAGE))
     p.add_argument("--out", help="ghi props mới ra file khác (mặc định ghi đè)")
-    p.add_argument("--still", action="store_true", help="không gọi fal.ai, dùng ảnh tĩnh chuyển động nhẹ")
+    p.add_argument("--still", action="store_true", help="không gọi dịch vụ, dùng ảnh tĩnh chuyển động nhẹ")
+    p.add_argument("--video", help="video người dẫn có sẵn (làm tay trên Topview); không có file thì dùng ảnh tĩnh")
     a = p.parse_args(argv)
     data = json.loads(Path(a.props).read_text(encoding="utf-8"))
     if not data.get("voice"):
@@ -164,7 +166,12 @@ def main(argv=None):
     folder = PUBLIC / "presenter"
     folder.mkdir(parents=True, exist_ok=True)
     out = folder / f"{time.strftime('%Y%m%d-%H%M%S')}.mp4"
-    if a.still:
+    if a.video and not Path(a.video).is_file():
+        print(f"Không thấy video người dẫn {a.video}: dùng ảnh tĩnh", file=sys.stderr)
+        a.still = True
+    if a.video and not a.still:
+        to_vertical(a.video, out)
+    elif a.still:
         still(a.image, audio, out)
     else:
         service = os.environ.get("PRESENTER_SERVICE") or ("topview" if os.environ.get("TOPVIEW_API_KEY") else "fal")
