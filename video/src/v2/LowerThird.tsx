@@ -12,7 +12,7 @@ export const LowerThird: React.FC<{ name: string; title: string; kicker?: string
   name,
   title,
   kicker = "NGƯỜI DẪN CHƯƠNG TRÌNH",
-  logoSrc = "logo-tvs.png",
+  logoSrc = "logo-d24.png",
   start = 24,
   end,
 }) => {
@@ -33,8 +33,9 @@ export const LowerThird: React.FC<{ name: string; title: string; kicker?: string
   return (
     <div style={{ position: "absolute", left: 40, bottom: 290, fontFamily: FONT, display: "flex", alignItems: "flex-end" }}>
       {/* Khối logo */}
-      <div style={{ position: "relative", zIndex: 2, width: H + 16, height: H + 16, marginBottom: -8, scale: String(logo), rotate: `${(1 - logo) * -12}deg`, filter: "drop-shadow(0 16px 30px rgba(0,0,0,.5))" }}>
-        <Img src={staticFile(logoSrc)} style={{ width: "100%", height: "100%" }} />
+      <div style={{ position: "relative", zIndex: 2, width: H, height: H, borderRadius: 22, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 18px 40px rgba(0,0,0,.45)", scale: String(logo), rotate: `${(1 - logo) * -12}deg` }}>
+        <Img src={staticFile(logoSrc)} style={{ width: H * 0.74 }} />
+        <div style={{ position: "absolute", inset: 0, borderRadius: 22, boxShadow: `inset 0 0 0 4px ${C.orange}` }} />
       </div>
 
       <div style={{ position: "relative", marginLeft: -22, height: H, clipPath: `inset(-60px ${(1 - wipe) * 100}% -10px 0)` }}>
@@ -71,7 +72,7 @@ export const LowerThird: React.FC<{ name: string; title: string; kicker?: string
   );
 };
 
-// Khung ghi công dự án (trọng tâm của cảnh mở đầu): logo Tìm Việc Số và dòng
+// Khung ghi công dự án (trọng tâm của cảnh mở đầu): logo Design24 và dòng
 // "Dự án được nghiên cứu và phát triển bởi HỌC VIỆN DESIGN24", căn giữa phía dưới khung hình.
 export const ProjectCredit: React.FC<{ start: number; end: number }> = ({ start, end }) => {
   const frame = useCurrentFrame();
@@ -93,8 +94,9 @@ export const ProjectCredit: React.FC<{ start: number; end: number }> = ({ start,
         background: "linear-gradient(135deg, rgba(6,20,80,.92) 0%, rgba(10,42,140,.9) 60%, rgba(11,134,232,.85) 100%)",
         boxShadow: `0 30px 70px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.22), 0 0 ${40 + 30 * pulse}px rgba(11,134,232,.45)` }}>
         <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 4, background: `linear-gradient(90deg, ${C.orange}, ${C.orange2}, rgba(255,162,63,0))` }} />
-        <div style={{ flex: "none", width: 190, height: 190, scale: String(logo), rotate: `${(1 - logo) * 14}deg`, filter: "drop-shadow(0 14px 26px rgba(0,0,0,.45))" }}>
-          <Img src={staticFile("logo-tvs.png")} style={{ width: "100%", height: "100%" }} />
+        <div style={{ flex: "none", position: "relative", width: 180, height: 180, borderRadius: 30, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 14px 30px rgba(0,0,0,.4)", scale: String(logo), rotate: `${(1 - logo) * 14}deg` }}>
+          <Img src={staticFile("logo-d24.png")} style={{ width: 134 }} />
+          <div style={{ position: "absolute", inset: 0, borderRadius: 30, boxShadow: `inset 0 0 0 4px ${C.orange}` }} />
         </div>
         <div style={{ flex: 1, color: "#fff" }}>
           <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: 6, color: C.orange2, opacity: l1, translate: `0 ${(1 - l1) * 20}px` }}>BẢN TIN TÌM VIỆC SỐ</div>
