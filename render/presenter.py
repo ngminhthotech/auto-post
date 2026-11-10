@@ -12,6 +12,7 @@ Cách dùng:
   python3 render/presenter.py props.json                       # dùng assets/nguoi-dan.jpg, ghi đè props.json
   python3 render/presenter.py props.json --image anh.png
   python3 render/presenter.py props.json --still               # không gọi dịch vụ: ảnh tĩnh chuyển động nhẹ (chạy thử bố cục)
+  python3 render/presenter.py props.json --auto                # routine: Topview nếu đã cấu hình, lỗi thì ảnh tĩnh
   python3 render/presenter.py props.json --video topview.mp4   # dùng video người dẫn đã làm tay trên Topview (cùng lời đọc voice[0])
 """
 import argparse
@@ -84,7 +85,8 @@ TOPVIEW = "https://api.topview.ai/v1"
 
 
 def tv_headers():
-    return {"Authorization": f"Bearer {os.environ['TOPVIEW_API_KEY']}", "Topview-Uid": os.environ["TOPVIEW_UID"]}
+    # Khóa có thể do proxy môi trường tự chèn (Network secrets cho api.topview.ai): khi đó gửi khóa giả, proxy thay bằng khóa thật
+    return {"Authorization": f"Bearer {os.environ.get('TOPVIEW_API_KEY') or 'proxy'}", "Topview-Uid": os.environ["TOPVIEW_UID"]}
 
 
 def tv_ok(r, what):
@@ -157,6 +159,8 @@ def main(argv=None):
     p.add_argument("--image", default=str(IMAGE))
     p.add_argument("--out", help="ghi props mới ra file khác (mặc định ghi đè)")
     p.add_argument("--still", action="store_true", help="không gọi dịch vụ, dùng ảnh tĩnh chuyển động nhẹ")
+    p.add_argument("--auto", action="store_true",
+                   help="dùng cho routine: có TOPVIEW_UID thì gọi Topview, lỗi hoặc chưa cấu hình thì dùng ảnh tĩnh (in CẢNH BÁO)")
     p.add_argument("--video", help="video người dẫn có sẵn (làm tay trên Topview); không có file thì dùng ảnh tĩnh")
     a = p.parse_args(argv)
     data = json.loads(Path(a.props).read_text(encoding="utf-8"))
@@ -174,11 +178,22 @@ def main(argv=None):
     elif a.still:
         still(a.image, audio, out)
     else:
-        service = os.environ.get("PRESENTER_SERVICE") or ("topview" if os.environ.get("TOPVIEW_API_KEY") else "fal")
+        service = os.environ.get("PRESENTER_SERVICE") or ("topview" if os.environ.get("TOPVIEW_UID") or os.environ.get("TOPVIEW_API_KEY") else "fal")
         raw = out.with_suffix(".raw.mp4")
-        (topview if service == "topview" else fal)(a.image, audio, raw)
-        to_vertical(raw, out)
-        raw.unlink()
+        try:
+            if a.auto and service == "topview" and not os.environ.get("TOPVIEW_UID"):
+                raise SystemExit("chưa có TOPVIEW_UID trong môi trường")
+            if a.auto and service == "fal" and not os.environ.get("FAL_KEY"):
+                raise SystemExit("chưa cấu hình Topview (TOPVIEW_UID) hay fal.ai (FAL_KEY)")
+            (topview if service == "topview" else fal)(a.image, audio, raw)
+            to_vertical(raw, out)
+        except (SystemExit, Exception) as e:
+            if not a.auto:
+                raise
+            print(f"CẢNH BÁO người dẫn: không dựng được video {service} ({e}); dùng ảnh tĩnh", file=sys.stderr)
+            still(a.image, audio, out)
+        finally:
+            raw.unlink(missing_ok=True)
     poster = out.with_suffix(".jpg")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", a.image, "-vf", "scale=1080:1920", str(poster)], check=True)
     data["presenter"] = {"src": f"presenter/{out.name}", "dur": duration(out), "poster": f"presenter/{poster.name}"}
