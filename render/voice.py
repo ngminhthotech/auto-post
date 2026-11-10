@@ -301,7 +301,7 @@ def script(d):
     lines = []
     # Người dẫn chương trình (Hoài Anh) tự giới thiệu ở cảnh mở đầu, rồi nói số việc toàn thời gian theo từng khu vực
     intro = ("Xin chào quý vị và các bạn, chào mừng đến với kênh truyền hình việc làm Cần Thơ. "
-             "Tôi là Nguyễn Hoài Anh, là CEO và Founder của Design24. "
+             "Tôi là Hoài Anh, là CEO và Founder của Design24. "
              f"Đây là Bản tin Tìm Việc Số. Hôm nay, ngày {dd}, tháng {mm}, năm {yy}, bản tin việc làm dành cho các bạn gồm ")
     areas = [(region_name(l["name"]), len(l["jobs"])) for l in d["lists"] if "cần thơ" in l["name"].lower()]
     if d.get("grid"):
