@@ -116,7 +116,7 @@ def tv_upload(path):
     return cred["fileId"]
 
 
-def topview(image, audio, out, timeout=900):
+def topview(image, audio, out, timeout=2700):  # hàng đợi API Topview có lúc mất hơn 20 phút
     body = {"templateImageFileId": tv_upload(image), "audioFileId": tv_upload(audio), "scriptMode": "audio",
             "mode": os.environ.get("TOPVIEW_MODE", "avatar4"), "customMotion": PROMPT}
     task = tv_ok(requests.post(f"{TOPVIEW}/photo_avatar/task/submit", json=body, headers=tv_headers(), timeout=60), "gửi yêu cầu dựng")
