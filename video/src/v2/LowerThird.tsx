@@ -1,6 +1,7 @@
 import React from "react";
 import { Easing, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, FONT } from "../brand";
+import { CreditContent, creditFx, type StatPop } from "./StatPops";
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const out = Easing.bezier(0.16, 1, 0.3, 1);
@@ -74,7 +75,8 @@ export const LowerThird: React.FC<{ name: string; title: string; kicker?: string
 
 // Khung ghi công dự án (trọng tâm của cảnh mở đầu): logo Tìm Việc Số và dòng
 // "Dự án được nghiên cứu và phát triển bởi HỌC VIỆN DESIGN24", căn giữa phía dưới khung hình.
-export const ProjectCredit: React.FC<{ start: number; end: number }> = ({ start, end }) => {
+// pops: số liệu thay vào chữ ghi công đúng lúc người dẫn đọc tới (delay: khung hình người dẫn bắt đầu nói)
+export const ProjectCredit: React.FC<{ start: number; end: number; pops?: StatPop[]; delay?: number }> = ({ start, end, pops, delay = 0 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const f = frame - start;
@@ -86,18 +88,21 @@ export const ProjectCredit: React.FC<{ start: number; end: number }> = ({ start,
   const band = interpolate(f, [30, 50], [0, 1], { ...clamp, easing: out });
   const shine = interpolate((f - 60) % 150, [0, 50], [-40, 140], clamp);
   const pulse = 0.5 + 0.5 * Math.sin(frame / 16);
+  const { cur, flash, sweep, accent } = creditFx(frame, pops, delay, fps);
   if (f < 0 || leave >= 1) return null;
   const show = Math.min(1, rise) * (1 - leave);
   return (
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 230, display: "flex", justifyContent: "center", fontFamily: FONT, opacity: show, translate: `0 ${(1 - rise) * 160 + leave * 60}px` }}>
       <div style={{ position: "relative", width: 1000, padding: "34px 40px 34px 34px", borderRadius: 34, display: "flex", alignItems: "center", gap: 30, overflow: "hidden",
-        background: "linear-gradient(135deg, rgba(6,20,80,.92) 0%, rgba(10,42,140,.9) 60%, rgba(11,134,232,.85) 100%)",
-        boxShadow: `0 30px 70px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.22), 0 0 ${40 + 30 * pulse}px rgba(11,134,232,.45)` }}>
+        background: cur >= 0 ? `linear-gradient(120deg, rgba(4,12,52,.95) 0%, rgba(8,28,100,.93) 55%, ${accent} 140%)` : "linear-gradient(135deg, rgba(6,20,80,.92) 0%, rgba(10,42,140,.9) 60%, rgba(11,134,232,.85) 100%)",
+        boxShadow: `0 30px 70px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.22), 0 0 ${40 + 30 * pulse + 70 * flash}px ${cur >= 0 ? accent : "rgba(11,134,232,.45)"}, inset 0 0 0 ${2 + 5 * flash}px rgba(255,255,255,${0.25 + 0.6 * flash})` }}>
+        {cur >= 0 && <div style={{ position: "absolute", top: 0, bottom: 0, left: `${sweep}%`, width: 90, background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0))", rotate: "12deg", scale: "1 1.6" }} />}
         <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 4, background: `linear-gradient(90deg, ${C.orange}, ${C.orange2}, rgba(255,162,63,0))` }} />
         <div style={{ flex: "none", width: 180, height: 180, display: "flex", alignItems: "center", justifyContent: "center", scale: String(logo), rotate: `${(1 - logo) * 14}deg` }}>
           <Img src={staticFile("logo-tvs.png")} style={{ width: 190, filter: "drop-shadow(0 14px 22px rgba(0,0,0,.45))" }} />
         </div>
-        <div style={{ flex: 1, color: "#fff" }}>
+        <CreditContent delay={delay} pops={pops} credit={
+        <div style={{ color: "#fff" }}>
           <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: 6, color: C.orange2, opacity: l1, translate: `0 ${(1 - l1) * 20}px` }}>BẢN TIN TÌM VIỆC SỐ</div>
           <div style={{ marginTop: 10, fontSize: 35, fontWeight: 700, lineHeight: 1.2, whiteSpace: "nowrap", opacity: l2, translate: `0 ${(1 - l2) * 24}px` }}>
             Dự án được nghiên cứu và phát triển bởi
@@ -108,6 +113,7 @@ export const ProjectCredit: React.FC<{ start: number; end: number }> = ({ start,
             </div>
           </div>
         </div>
+        } />
         <div style={{ position: "absolute", top: -60, bottom: -60, width: 160, left: `${shine}%`, background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.22), rgba(255,255,255,0))", rotate: "20deg" }} />
       </div>
     </div>

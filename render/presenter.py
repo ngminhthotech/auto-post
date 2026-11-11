@@ -31,6 +31,15 @@ import requests
 ROOT = Path(__file__).resolve().parent.parent
 PUBLIC = ROOT / "video" / "public"
 IMAGE = ROOT / "assets" / "nguoi-dan.jpg"
+
+
+def image_of_day():
+    """Mỗi thứ trong tuần một bộ trang phục: assets/nguoi-dan/thu-2.jpg ... thu-7.jpg, chu-nhat.jpg
+    (theo ngày giờ Việt Nam); thiếu ảnh của hôm đó thì dùng assets/nguoi-dan.jpg."""
+    from datetime import datetime, timedelta, timezone
+    wd = datetime.now(timezone(timedelta(hours=7))).weekday()  # 0 = thứ Hai
+    f = ROOT / "assets" / "nguoi-dan" / ("chu-nhat.jpg" if wd == 6 else f"thu-{wd + 2}.jpg")
+    return f if f.exists() else IMAGE
 MODEL = os.environ.get("PRESENTER_MODEL", "fal-ai/kling-video/ai-avatar/v2/pro")
 PROMPT = ("Người dẫn chương trình bản tin chuyên nghiệp, ngồi trong trường quay, nhìn thẳng vào ống kính, "
           "nói tự nhiên, thân thiện, cử chỉ tay nhẹ nhàng, đầu gật nhẹ theo nhịp nói, máy quay đứng yên.")
@@ -161,7 +170,7 @@ def still(image, audio, out):
 def main(argv=None):
     p = argparse.ArgumentParser(prog="render/presenter.py")
     p.add_argument("props", help="props JSON đã có voice (render/voice.py)")
-    p.add_argument("--image", default=str(IMAGE))
+    p.add_argument("--image", default=str(image_of_day()))
     p.add_argument("--out", help="ghi props mới ra file khác (mặc định ghi đè)")
     p.add_argument("--still", action="store_true", help="không gọi dịch vụ, dùng ảnh tĩnh chuyển động nhẹ")
     p.add_argument("--auto", action="store_true",
@@ -201,6 +210,12 @@ def main(argv=None):
     poster = out.with_suffix(".jpg")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", a.image, "-vf", "scale=1080:1920", str(poster)], check=True)
     data["presenter"] = {"src": f"presenter/{out.name}", "dur": duration(out), "poster": f"presenter/{poster.name}"}
+    # Số liệu đổi lần lượt trong khung ghi công đúng lúc người dẫn đọc tới (render/pops.py); lỗi thì bỏ qua
+    try:
+        import pops
+        data["presenter"]["pops"] = pops.compute(data)
+    except Exception as e:  # noqa: BLE001
+        print(f"Bỏ qua số liệu bật ra: {e}", file=sys.stderr)
     Path(a.out or a.props).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(out)
     return 0
