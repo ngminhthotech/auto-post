@@ -98,8 +98,14 @@ export const ProjectCredit: React.FC<{ start: number; end: number; pops?: StatPo
         boxShadow: `0 30px 70px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.22), 0 0 ${40 + 30 * pulse + 70 * flash}px ${cur >= 0 ? accent : "rgba(11,134,232,.45)"}, inset 0 0 0 ${2 + 5 * flash}px rgba(255,255,255,${0.25 + 0.6 * flash})` }}>
         {cur >= 0 && <div style={{ position: "absolute", top: 0, bottom: 0, left: `${sweep}%`, width: 90, background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0))", rotate: "12deg", scale: "1 1.6" }} />}
         <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 4, background: `linear-gradient(90deg, ${C.orange}, ${C.orange2}, rgba(255,162,63,0))` }} />
-        <div style={{ flex: "none", width: 180, height: 180, display: "flex", alignItems: "center", justifyContent: "center", scale: String(logo), rotate: `${(1 - logo) * 14}deg` }}>
-          <Img src={staticFile("logo-tvs.png")} style={{ width: 190, filter: "drop-shadow(0 14px 22px rgba(0,0,0,.45))" }} />
+        <div style={{ flex: "none", width: 190, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 180, height: 160, display: "flex", alignItems: "center", justifyContent: "center", scale: String(logo), rotate: `${(1 - logo) * 14}deg` }}>
+            <Img src={staticFile("logo-tvs.png")} style={{ width: 170, filter: "drop-shadow(0 14px 22px rgba(0,0,0,.45))" }} />
+          </div>
+          {/* Địa chỉ kênh dưới logo Tìm Việc Số */}
+          <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: 0.2, color: "#fff", whiteSpace: "nowrap", opacity: l2, padding: "4px 8px", borderRadius: 8, background: "rgba(255,255,255,.14)" }}>
+            www.vieclamcantho.tv
+          </div>
         </div>
         <CreditContent delay={delay} pops={pops} credit={
         <div style={{ color: "#fff" }}>
