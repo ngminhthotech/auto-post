@@ -25,7 +25,7 @@ import requests
 API = "https://api.vbee.vn/v1/tts"
 VOICES_API = "https://vbee.vn/api/public/v1/voices"
 LEGACY_API = "https://vbee.vn/api/v1/tts"
-DEFAULT_VOICE = "s_cantho_male_nguyenhoaianhdemo_zero_shot_story_vc"  # giọng clone Nguyễn Hoài Anh
+DEFAULT_VOICE = "s_cantho_male_nghoaianhdocnhanh_zero_shot_advertise_vc"  # giọng clone Nguyễn Hoài Anh (đọc nhanh, từ 11/11/2026)
 DEFAULT_SPEED = "1.0"
 MAX_CHARS = 300
 ROOT = Path(__file__).resolve().parent.parent
