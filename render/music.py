@@ -1,7 +1,7 @@
 """Tạo nhạc nền và âm hiệu ứng cho video (tự tổng hợp bằng code, không dính bản quyền).
 
 Cách dùng: python3 render/music.py video/public/
-Tạo ra: music.wav (60 giây, 112 BPM, vòng hợp âm C-G-Am-F), whoosh.wav, pop.wav
+Tạo ra: music.wav (60 giây, 112 BPM, vòng hợp âm C-G-Am-F), whoosh.wav, pop.wav, ting.wav
 """
 
 import sys
@@ -149,6 +149,22 @@ def pop():
     return y * 0.5
 
 
+def ting():
+    """Tiếng "ting ting" khi số liệu hiện lên: hai tiếng chuông (A6 rồi D7) cách nhau 0,09 giây."""
+    t = np.arange(int(0.9 * SR)) / SR
+
+    def bell(f0):
+        return (np.sin(2 * np.pi * f0 * t) + 0.45 * np.sin(2 * np.pi * f0 * 2.76 * t) * np.exp(-t * 9)
+                + 0.25 * np.sin(2 * np.pi * f0 * 5.4 * t) * np.exp(-t * 16)) * np.exp(-t * 5.5)
+
+    d = int(0.09 * SR)
+    y = np.zeros(len(t) + d)
+    y[:len(t)] += bell(1760)
+    y[d:] += 0.8 * bell(2349)
+    y *= np.minimum(1, np.arange(len(y)) / (SR * 0.003))
+    return y / np.max(np.abs(y)) * 0.85
+
+
 def save(path, data):
     data = np.clip(data, -1, 1)
     pcm = (data * 32767).astype(np.int16)
@@ -166,4 +182,5 @@ if __name__ == "__main__":
     save(out / "music.wav", music())
     save(out / "whoosh.wav", whoosh())
     save(out / "pop.wav", pop())
-    print(f"Đã tạo music.wav, whoosh.wav, pop.wav trong {out}")
+    save(out / "ting.wav", ting())
+    print(f"Đã tạo music.wav, whoosh.wav, pop.wav, ting.wav trong {out}")

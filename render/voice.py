@@ -632,7 +632,7 @@ def main(argv=None):
         # ở cuối câu cảm thán, chữ "chào" nghe thành "chao". Đọc liền thì "chào" xuống giọng đúng dấu huyền
         # và giọng vẫn tự nghỉ khoảng 0,27 giây sau "bạn,".
         tts(line, voice, f, a.speed)
-        data["voice"].append({"src": f"voice/{slug}/{i}.mp3", "dur": round(duration(f), 2), "text": caption(line)})
+        data["voice"].append({"src": f"voice/{slug}/{i}.mp3", "dur": round(duration(f), 2), "text": caption(line), "say": line})
     Path(a.out).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(a.out)
     return 0

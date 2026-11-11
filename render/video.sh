@@ -11,7 +11,7 @@ json="$(realpath "$1")"; out="$(realpath -m "$2")"; voice="${3:-}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root/video"
 [ -d node_modules ] || npm ci --no-audit --no-fund >/dev/null
-[ -f public/music.wav ] || python3 "$root/render/music.py" public/ >/dev/null
+[ -f public/music.wav ] && [ -f public/ting.wav ] || python3 "$root/render/music.py" public/ >/dev/null
 tmp="$(mktemp -d)"
 if [ "$voice" = "--voice" ]; then
   style=pro; [ "${COMP:-BangTinPro}" = "BangTin" ] && style=basic
