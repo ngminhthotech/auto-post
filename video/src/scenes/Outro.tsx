@@ -13,6 +13,7 @@ const SAFE_CTA = (cta?: string) =>
 const ITEMS = [
   { icon: "globe", label: "Website", value: CONTACT.website },
   { icon: "send", label: "Ứng dụng", value: "Tìm Việc Số • Android và iOS" },
+  { icon: "globe", label: "Kênh truyền hình việc làm Cần Thơ", value: "www.vieclamcantho.tv" },
 ];
 
 export const Outro: React.FC<{ data: BangTinData }> = ({ data }) => {
