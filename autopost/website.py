@@ -127,18 +127,14 @@ def build(folder, day):
     folder = Path(folder)
     d = Date.fromisoformat(day)
     dmy = d.strftime("%d/%m/%Y")
-    yt_title = (folder / "youtube-tieude.txt").read_text(encoding="utf-8").strip() \
-        if (folder / "youtube-tieude.txt").exists() else ""
-    topic = re.sub(r"\s*#\w+", "", yt_title).strip()
-    title = f"Bản tin Việc Làm Cần Thơ ngày {dmy}"
-    if topic:
-        title += f" | {re.sub(r'\s*\d{1,2}/\d{1,2}(/\d{4})?', '', topic).strip(' :|-')}"
+    # Cùng kiểu "Chương trình | phụ đề" với các video khác trên trang, ngắn để thẻ video không bị cắt.
+    title = f"Bản tin Việc Làm Cần Thơ | Ngày {dmy}"
     desc_file = folder / "caption-facebook.txt"
     if not desc_file.exists():
         desc_file = folder / "youtube-mota.txt"
     description = desc_file.read_text(encoding="utf-8").strip() if desc_file.exists() else ""
     return {
-        "title": title[:250],
+        "title": title,
         "slug": f"ban-tin-viec-lam-can-tho-{d.strftime('%d-%m-%Y')}",
         "description": description,
         "publish_date": day,
@@ -152,7 +148,7 @@ def build(folder, day):
 
 
 def thumbnail(folder):
-    """Khung hình cảnh mở đầu (người dẫn) làm ảnh bìa; None nếu không có video."""
+    """Ảnh bìa 16:9 (1280x720, như các video khác trên trang): khung hình cảnh mở đầu đặt giữa nền mờ."""
     folder = Path(folder)
     video = next((folder / n for n in ("video-main.mp4", "video.mp4") if (folder / n).exists()), None)
     if not video:
@@ -160,7 +156,9 @@ def thumbnail(folder):
     out = Path(tempfile.mkdtemp()) / "anh-bia.jpg"
     try:
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "4", "-i", str(video), "-frames:v", "1",
-                        "-vf", "scale='min(1080,iw)':-2", "-q:v", "3", str(out)], check=True)
+                        "-filter_complex",
+                        "[0:v]split[a][b];[a]scale=1280:720:force_original_aspect_ratio=increase,crop=1280:720,boxblur=24:2[bg];"
+                        "[b]scale=-2:720[fg];[bg][fg]overlay=(W-w)/2:0", "-q:v", "3", str(out)], check=True)
     except (OSError, subprocess.CalledProcessError):
         return None
     return out
