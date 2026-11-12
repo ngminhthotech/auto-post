@@ -16,6 +16,8 @@ Lệnh (routine chạy như một lệnh đơn):
       Đã có ket-qua-website.json báo ok, hoặc trang đã có video cùng YouTube id, thì không đăng lại.
   python3 -m autopost.website dang out --date 2026-11-12 --dry-run
       Chỉ in nội dung sẽ đăng.
+  python3 -m autopost.website lich 33 --date 2026-11-12
+      Chỉ đặt khung 7:00 hằng ngày trong lịch phát sóng trỏ tới video id 33 (bước dang đã tự làm).
   python3 -m autopost.website list
       Liệt kê video mới nhất trong mục Bản tin Việc Làm Cần Thơ.
 """
@@ -41,6 +43,8 @@ CATEGORY_SLUG = "ban-tin-viec-lam-can-tho"
 PROGRAM_ID = 14         # chương trình Bản tin Việc Làm Cần Thơ
 TAG_IDS = [2, 6]        # Hướng nghiệp, Tin tức
 TIMEOUT = 60
+CHANNEL_ID = 1          # Hướng nghiệp TV
+SLOT_START, SLOT_END = "07:00", "08:00"   # khung "Chương trình trong ngày" của bản tin, lặp hằng ngày
 PROJECT_FILES = Path("/mnt/project-files/auto-post")
 
 
@@ -164,6 +168,22 @@ def thumbnail(folder):
     return out
 
 
+def lich(video_id, day):
+    """Khung 7:00 hằng ngày trong lịch phát sóng (khung "Chương trình trong ngày" ở trang chủ) trỏ tới
+    bản tin mới nhất: có khung rồi thì đổi video, chưa có thì tạo."""
+    body = {"channel_id": CHANNEL_ID, "program_id": PROGRAM_ID, "video_id": video_id, "date": day,
+            "start_time": SLOT_START, "end_time": SLOT_END, "is_live": False, "is_daily": True}
+    slots = call("GET", "/schedules", params={"per_page": 100}).get("data") or []
+    slot = next((x for x in slots if x.get("program_id") == PROGRAM_ID and x.get("is_daily")
+                 and (x.get("start_time") or "")[:5] == SLOT_START), None)
+    if slot:
+        if slot.get("video_id") != video_id:
+            call("PUT", f"/schedules/{slot['id']}", json={**body, "date": (slot.get("date") or day)[:10]})
+        return {"schedule": slot["id"], "updated": slot.get("video_id") != video_id}
+    data = call("POST", "/schedules", json=body).get("data") or {}
+    return {"schedule": data.get("id"), "created": True}
+
+
 def dang(folder, day, wait_minutes=30, dry_run=False):
     folder = Path(folder)
     result_file = folder / "ket-qua-website.json"
@@ -208,6 +228,10 @@ def dang(folder, day, wait_minutes=30, dry_run=False):
                "youtube": link, "title": payload["title"]}
         if warn:
             out["warnings"] = warn
+    try:
+        out["lich"] = lich(out["id"], day)
+    except WebsiteError as exc:
+        out.setdefault("warnings", []).append(f"lịch phát sóng: {exc}")
     result_file.write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
     dest = PROJECT_FILES / f"bai-{day}-0700"
     if dest.is_dir():
@@ -225,13 +249,19 @@ def main(argv=None):
     pd.add_argument("--wait", type=int, default=30, help="số phút tối đa chờ bài YouTube lên (mặc định 30)")
     pd.add_argument("--dry-run", action="store_true")
     sub.add_parser("list", help="video mới nhất trong mục Bản tin Việc Làm Cần Thơ")
+    pl = sub.add_parser("lich", help="khung 7:00 hằng ngày trỏ tới một video")
+    pl.add_argument("video_id", type=int)
+    pl.add_argument("--date", required=True)
     args = p.parse_args(argv)
     try:
         if args.cmd == "list":
             for v in bulletin_videos():
                 print(f"{v['id']}  {(v.get('publish_date') or '')[:10]}  {v['title']}  |  https://youtu.be/{v.get('youtube_id')}")
             return 0
-        out = dang(args.folder, args.date, args.wait, args.dry_run)
+        if args.cmd == "lich":
+            out = {"ok": True, **lich(args.video_id, args.date)}
+        else:
+            out = dang(args.folder, args.date, args.wait, args.dry_run)
     except Exception as exc:  # báo lỗi gọn cho routine, không làm hỏng các bước khác
         print(json.dumps({"ok": False, "error": str(exc)[-800:]}, ensure_ascii=False))
         return 1
