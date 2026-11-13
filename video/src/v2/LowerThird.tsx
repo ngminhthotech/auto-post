@@ -104,7 +104,7 @@ export const ProjectCredit: React.FC<{ start: number; end: number; pops?: StatPo
           </div>
           {/* Địa chỉ kênh dưới logo Tìm Việc Số */}
           <div style={{ fontSize: 18, fontWeight: 800, letterSpacing: 0.2, color: "#fff", whiteSpace: "nowrap", opacity: l2, padding: "4px 8px", borderRadius: 8, background: "rgba(255,255,255,.14)" }}>
-            www.vieclamcantho.tv
+            www.timviecso.vn
           </div>
         </div>
         <CreditContent delay={delay} pops={pops} credit={
