@@ -65,7 +65,16 @@ Tài khoản TikTok @timviecso.vn đã bị cảnh cáo (thêm 3 lần có thể
 
 ### Đăng tự động khoảng 2 giờ một tin
 
-Tác vụ Claude "Đăng timviecso.vn (2 giờ 1 tin)" chạy `python3 -m autopost.careerviet --max 1` mỗi 2 giờ (`.github/workflows/quet-tin.yml` chỉ để chạy tay): lấy tin mới nhất trên CareerViet có nơi làm việc chính ở Cần Thơ, ĐBSCL hoặc TP.HCM, chọn khu vực đang thiếu nhất trên trang theo tỉ lệ Cần Thơ 4 : ĐBSCL 3 : TP.HCM 2 (hòa thì ưu tiên Cần Thơ, rồi ĐBSCL; khu vực thiếu không có tin mới thì lấy khu vực kế), lọc cố định (còn hạn, có tên công ty, không có dấu hiệu thu phí, chưa có trên trang), tự gắn logo và link nguồn, đăng 1 tin. Không có tin mới thì chờ lượt sau.
+Tác vụ Claude "Đăng timviecso.vn (2 giờ 1 tin)" chạy `python3 -m autopost.careerviet --max 1` mỗi 2 giờ từ 9h đến 21h, và tác vụ "đợt 7:00" chạy `--max 5` (`.github/workflows/quet-tin.yml` chỉ để chạy tay).
+
+Trang chủ timviecso.vn có 3 cột theo trường `workType`: Thực tập, Bán thời gian, Toàn thời gian. Từ 14/11/2026, mỗi tin được chọn như sau:
+
+1. Thực tập và Bán thời gian / Thời vụ trước: mỗi loại cần 3 tin mỗi ngày (giờ Việt Nam, đếm theo ngày đăng trên trang; đổi bằng `--quota N`). Loại nào hôm nay đăng ít hơn thì trước. Tin lấy từ tìm kiếm theo từ khóa trên CareerViet (thực tập sinh, thực tập, intern; part-time, bán thời gian, thời vụ), loại hình xác định theo `job_type` của CareerViet, nơi làm việc chính ở Cần Thơ, ĐBSCL hoặc TP.HCM. Lọc thêm: bỏ việc online, tại nhà, làm từ xa, bảo hiểm, tài chính, trả góp, bất động sản, đa cấp.
+2. Đủ hạn mức (hoặc hết tin thực tập, bán thời gian mới) thì đăng tin toàn thời gian như cũ: khu vực đang thiếu nhất theo tỉ lệ Cần Thơ 4 : ĐBSCL 3 : TP.HCM 2 (hòa thì ưu tiên Cần Thơ, rồi ĐBSCL; khu vực thiếu không có tin mới thì lấy khu vực kế).
+
+Lọc cố định cho mọi tin: còn hạn, có tên công ty, không có dấu hiệu thu phí, chưa có trên trang. Tự gắn logo và link nguồn. Không có tin mới thì chờ lượt sau. Kết quả in `theo_loai_hinh` (số tin từng cột trên trang) và `dang_hom_nay` (số tin từng loại đã đăng hôm nay).
+
+Khi kiểm tra tin vừa đăng (mở link "Nguồn: ..."), với tin Thực tập hoặc Bán thời gian xem thêm: tin gốc đúng là thực tập hoặc bán thời gian, thời vụ (không phải việc toàn thời gian bị gắn nhầm), không phải việc online, tại nhà, cộng tác viên ăn hoa hồng. Sai loại hình thì gỡ.
 
 ### Gỡ tin hết hạn (mỗi ngày 0:23)
 
