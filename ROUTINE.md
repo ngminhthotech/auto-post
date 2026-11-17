@@ -93,3 +93,7 @@ Tác vụ này đang tắt. Khi bật lại:
 ## Báo cáo hiệu quả hàng tuần (thứ Hai 8:41)
 
 Tác vụ Claude "Báo cáo hiệu quả tuần" chạy `python3 -m autopost.insights --days 7` (số liệu `metrics` của bài trong Buffer: lượt xem, tương tác theo kênh, khung giờ, kiểu bài, top 5 bài), so với tuần trước (`--days 14`), rồi viết đề xuất giờ đăng và kiểu video vào `/mnt/project-files/auto-post/bao-cao/hieu-qua-tuan-<yyyy-mm-dd>.md`. Bài mới đăng dưới 24 giờ chưa đủ số liệu, không dùng để kết luận.
+
+## Bảng điều khiển (12:47 và 21:47, hoặc khi bấm trên trang)
+
+Tác vụ Claude "Auto Post - Bảng điều khiển (cập nhật số liệu, gỡ tin)" chạy `python3 -m autopost.dashboard snapshot`. Khi trang gửi khối "GỠ TIN" (mã tin và lý do) thì chạy `python3 -m autopost.dashboard go <id...> --reason "..."` thay vào đó. Không đăng gì.
