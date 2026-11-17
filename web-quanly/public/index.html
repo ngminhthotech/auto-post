@@ -255,6 +255,36 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
   .tl-row,.tl-axis{grid-template-columns:1fr}.tl-axis>div:first-child{display:none}
 }
 @media (max-width:520px){.g4,.bul{grid-template-columns:1fr}.kpi .val{font-size:26px}.top h1{font-size:17px}}
+/* điện thoại: bảng thành thẻ, mỗi ô có nhãn cột */
+@media (max-width:640px){
+  .tbox{overflow:visible}
+  .tbox table,.tbox tbody,.tbox tr,.tbox td{display:block;width:100%}
+  .tbox thead{display:none}
+  .tbox tr{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .tbox td{border:0;padding:0!important;text-align:left;min-width:0}
+  .tbox td.num{text-align:left}
+  .tbox td[data-label]::before{content:attr(data-label);display:block;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
+  .tbox td.wide,.tbox td[colspan]{grid-column:1/-1}
+  .tbox td.wide::before{display:none!important}
+  .tbox td.pick{position:absolute;right:14px;top:14px;width:auto}
+  .tbox td.pick::before,.tbox td.act::before{display:none!important}
+  .tbox tr:has(td.pick) td.wide{padding-right:30px!important}
+  .tbox td.act{grid-column:1/-1}.tbox td.act .links{justify-content:flex-start}
+  .tbox td.act:empty,.tbox td.act:has(.links:empty){display:none}
+  tbody tr:hover td{background:none}
+  .job,.post{min-width:0}
+  .post .t{-webkit-line-clamp:3}
+  .mono{white-space:normal}
+  .toolbar{padding:0 16px 12px}
+  .toolbar .search,.toolbar select.sel{flex:1 1 100%;max-width:none;width:100%}
+  .toolbar #x-jobs,.toolbar #x-posts{margin-left:0!important}
+  .card-h{padding:14px 16px 0}.card-b{padding:14px 16px 16px}
+  .card-h .right{margin-left:0;width:100%}
+  .pager{padding:12px 16px}
+  .bulk{border-radius:14px;bottom:10px}
+  .bulk input{flex-basis:100%}
+  .al{flex-wrap:wrap}.al .r{margin-left:44px}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1059,6 +1089,19 @@ document.querySelectorAll("#chips-emp,#chips-kw").forEach((el) => el.addEventLis
   try { await saveBlock(b.dataset.kind, list); toast(`Đã bỏ chặn "${gone}".`); } catch (err) { toast(err.message, true); }
 }));
 
+
+/* điện thoại: gắn nhãn cột cho từng ô để bảng hiện thành thẻ */
+function labelTable(tb) {
+  const heads = [...tb.closest("table").querySelectorAll("thead th")].map((th) => th.textContent.trim());
+  for (const tr of tb.rows) [...tr.cells].forEach((td, i) => {
+    if (td.colSpan > 1) return;
+    if (td.querySelector('input[type="checkbox"]')) td.classList.add("pick");
+    else if (td.querySelector(".job,.post")) td.classList.add("wide");
+    else if (td.querySelector(".links") || !heads[i]) td.classList.add("act");
+    if (heads[i] && !td.classList.contains("wide")) td.dataset.label = heads[i];
+  });
+}
+document.querySelectorAll(".tbox tbody").forEach((tb) => new MutationObserver(() => labelTable(tb)).observe(tb, {childList: true}));
 
 route();
 load(false);
