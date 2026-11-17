@@ -9,6 +9,7 @@ const JOB_URL = (id) => `https://timviecso.vn/design24/jobs/${id}`;
 const ENGAGE = ["reactions", "comments", "shares", "clicks"];
 const ID_RE = /^[0-9a-f]{24}$/;
 const SESSION_DAYS = 14;
+const PUBLIC_FILES = new Set(["/logo.png", "/logo-d24.png", "/favicon.png"]);
 
 // Lịch các tác vụ Claude (giờ Việt Nam). Website không đổi được lịch này; đổi trên bảng điều khiển Claude.
 const SCHEDULE = [
@@ -26,6 +27,7 @@ export default {
     try {
       if (url.pathname === "/login") return login(req, env);
       if (url.pathname === "/logout") return logout(env);
+      if (PUBLIC_FILES.has(url.pathname)) return env.ASSETS.fetch(req);
       const user = await authenticate(req, env);
       if (!user) {
         if (url.pathname.startsWith("/api/")) return json({error: "Chưa đăng nhập"}, 401);
@@ -132,16 +134,80 @@ function logout(env) {
   }});
 }
 function loginPage(error) {
-  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Đăng nhập Auto Post</title><style>
-:root{--bg:#f3f5f4;--panel:#fff;--ink:#14201d;--muted:#5b6b67;--line:#d9e1de;--accent:#0b6e63;--bad:#b42318}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1513;--panel:#161e1b;--ink:#e4ece9;--muted:#93a39e;--line:#2a3632;--accent:#4fc3b1;--bad:#f2877c;color-scheme:dark}}
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,sans-serif;padding:16px}
-form{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;display:grid;gap:12px;width:min(360px,100%)}
-h1{font-size:18px;margin:0}input{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
-button{font:inherit;padding:8px;border:0;border-radius:8px;background:var(--accent);color:var(--panel);font-weight:600;cursor:pointer}.e{color:var(--bad)}</style></head>
-<body><form method="post"><h1>Auto Post</h1><label for="pw">Mật khẩu</label><input id="pw" name="password" type="password" autocomplete="current-password" required autofocus>
-${error ? `<div class="e">${error}</div>` : ""}<button>Đăng nhập</button></form></body></html>`;
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Đăng nhập · Auto Post Tìm Việc Số</title><link rel="icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--ink:#0f1b3d;--muted:#5a6785;--line:#dfe5f0;--bg:#f5f7fb;--panel:#fff;--brand:#0813df;--brand-2:#0b86e8;--deep:#061450;--navy:#0a2a8c;--grad:linear-gradient(90deg,#0813df,#0b86e8);--orange:#ff7f14;--bad:#c62828;--bad-bg:#fdecea;--field:#f8fafd}
+@media (prefers-color-scheme:dark){:root{--ink:#e8edf8;--muted:#9aa6c2;--line:#25304d;--bg:#0b1020;--panel:#111830;--field:#0e1529;--bad:#ff8a80;--bad-bg:#3a1714;color-scheme:dark}}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.brand{position:relative;overflow:hidden;color:#fff;padding:48px 56px;display:flex;flex-direction:column;justify-content:space-between;
+background:radial-gradient(800px 520px at 100% 0%,rgba(11,134,232,.85),transparent 62%),linear-gradient(150deg,#0813df 0%,#0a1ec4 55%,#0b3fd6 100%)}
+.sq{position:absolute;background:#ff7f14;z-index:0}.sq.a{width:96px;height:96px;right:-24px;top:150px}.sq.b{width:28px;height:28px;right:96px;top:120px;opacity:.9}.sq.c{width:260px;height:260px;right:-120px;bottom:-130px;background:rgba(255,255,255,.07)}
+.brand::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(180deg,#000,transparent 85%);pointer-events:none}
+.logo{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.logo .tile{width:76px;height:58px;border-radius:16px;background:#fff;display:grid;place-items:center;box-shadow:0 10px 28px rgba(0,0,0,.22)}.logo .tile img{width:60px;height:auto}
+.logo b{display:block;font-size:19px;letter-spacing:-.01em}.logo span{font-size:13px;opacity:.75}
+.hero{position:relative;z-index:1;max-width:520px}
+.hero h1{font-size:clamp(28px,3.2vw,40px);line-height:1.15;letter-spacing:-.02em;margin:0 0 14px;font-weight:800;text-wrap:balance}
+.hero h1 em{font-style:normal;color:#ffb36b}
+.hero .kicker{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;opacity:.9}.hero .kicker::before{content:"";width:10px;height:10px;background:#ff7f14}
+.hero p{margin:0;font-size:15.5px;line-height:1.6;opacity:.82;max-width:44ch}
+.feats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:560px}
+.feat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px;backdrop-filter:blur(6px)}
+.feat b{display:block;font-size:14px;margin-bottom:2px}.feat span{font-size:12.5px;opacity:.75;line-height:1.45}
+.side{display:grid;place-items:center;padding:40px max(24px,env(safe-area-inset-right))}
+form{width:min(400px,100%);display:grid;gap:18px}
+.mlogo{display:none;align-items:center;gap:12px}.mlogo img{width:64px;height:auto}
+h2{margin:0;font-size:26px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}h2::after{content:"";width:10px;height:10px;background:#ff7f14}.sub{margin:-10px 0 4px;color:var(--muted);font-size:14.5px}
+label{font-size:13.5px;font-weight:600}
+.field{position:relative;margin-top:6px}
+.field svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+input{width:100%;font:inherit;font-size:15px;padding:13px 46px 13px 42px;border:1.5px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);transition:border-color .15s,box-shadow .15s}
+input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px rgba(8,19,223,.12)}
+.eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);cursor:pointer;padding:8px;border-radius:8px}
+.eye:hover{color:var(--ink)}.eye svg{position:static;transform:none}
+.err{display:flex;gap:10px;align-items:flex-start;background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:12px 14px;font-size:14px}
+.err svg{flex:none;width:18px;height:18px;margin-top:1px}
+button.go{font:inherit;font-weight:700;font-size:15px;padding:13px;border:0;border-radius:12px;color:#fff;cursor:pointer;background:var(--grad);box-shadow:0 10px 24px rgba(8,19,223,.28);transition:transform .1s,box-shadow .15s}
+button.go:hover{box-shadow:0 12px 28px rgba(11,111,216,.38)}button.go:active{transform:translateY(1px)}
+button:focus-visible{outline:3px solid rgba(11,134,232,.45);outline-offset:2px}
+.note{font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}.note svg{width:16px;height:16px;flex:none}
+.foot{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px}
+@media (max-width:900px){body{grid-template-columns:1fr}.brand{display:none}.mlogo{display:flex}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<aside class="brand">
+  <span class="sq a"></span><span class="sq b"></span>
+  <div class="logo"><span class="tile"><img src="/logo-d24.png" alt="Design24"></span><div><b>Học viện Design24</b><span>Auto Post · Tìm Việc Số</span></div></div>
+  <div class="hero"><div class="kicker">Bảng điều khiển</div><h1>Toàn bộ kênh đăng tin, <em>trong một màn hình.</em></h1>
+  <p>Theo dõi bản tin 7:00 trên Facebook, TikTok, YouTube, tin tuyển dụng trên timviecso.vn và lịch chạy tự động mỗi ngày.</p></div>
+  <div class="feats">
+    <div class="feat"><b>Bản tin 7:00</b><span>Trạng thái từng kênh, link và lượt xem</span></div>
+    <div class="feat"><b>Tin tuyển dụng</b><span>Duyệt và gỡ tin ngay trên trang</span></div>
+    <div class="feat"><b>Số liệu 30 ngày</b><span>Lượt xem, tương tác, bài lỗi</span></div>
+  </div>
+</aside>
+<main class="side">
+  <form method="post" autocomplete="on">
+    <div class="mlogo"><img src="/logo-d24.png" alt="Design24"><div><b>Học viện Design24</b><div class="sub" style="margin:0">Auto Post · Tìm Việc Số</div></div></div>
+    <h2>Đăng nhập</h2>
+    <p class="sub">Bảng điều khiển riêng của chủ dự án.</p>
+    ${error ? `<div class="err" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span>${esc(error)}</span></div>` : ""}
+    <div><label for="pw">Mật khẩu</label>
+      <div class="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <input id="pw" name="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required autofocus>
+      <button class="eye" type="button" id="eye" aria-label="Hiện mật khẩu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+    <button class="go" type="submit">Đăng nhập</button>
+    <div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Ghi nhớ đăng nhập 14 ngày trên thiết bị này.</div>
+    <div class="foot">© Học viện Design24 · timviecso.vn</div>
+  </form>
+</main>
+<script>document.getElementById("eye").onclick=function(){var i=document.getElementById("pw");var s=i.type==="password";i.type=s?"text":"password";this.setAttribute("aria-label",s?"Ẩn mật khẩu":"Hiện mật khẩu");i.focus()}</script>
+</body></html>`;
 }
 
 /* ---------------- API ---------------- */
@@ -258,7 +324,7 @@ function mapJobs(list) {
   return (list || []).map((j) => {
     const src = [...(j.description || [])].reverse().map((l) => String(l).match(/^\s*Nguồn:\s*(\S+)/)).find(Boolean);
     return {
-      id: j._id, title: j.title, employer: (j.employer || {}).name, location: j.location, workType: j.workType || "",
+      id: j._id, title: j.title, employer: (j.employer || {}).name, logo: (j.employer || {}).logo || "", location: j.location, workType: j.workType || "",
       salary: j.salary, deadline: (j.deadline || "").slice(0, 10), created_vn: vn(j.createdAt), url: JOB_URL(j._id), source: src ? src[1] : "",
     };
   }).sort((a, b) => (b.created_vn || "").localeCompare(a.created_vn || ""));
