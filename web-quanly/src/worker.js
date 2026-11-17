@@ -19,8 +19,7 @@ const TASK_NAMES = {"bantin": "Bản tin video 7:00", "website-video": "Video b�
 // key: tên tác vụ khi báo kết quả về website (autopost.control); grace: số phút chờ báo trước khi coi là lỡ lượt.
 const SCHEDULE = [
   {key: "bantin", grace: 210, name: "Bản tin video 7:00 (FB, TikTok, YouTube, timviecso.vn)", times: ["5:17"], days: "Hằng ngày", note: "Dựng video từ 5:17, đăng 7:00"},
-  {key: "timviecso-dang", grace: 75, name: "Đăng timviecso.vn đợt 7:00 (5 tin)", times: ["6:52"], days: "Hằng ngày"},
-  {key: "timviecso-dang", grace: 75, name: "Đăng timviecso.vn (2 giờ 1 tin)", times: ["9:07", "11:07", "13:07", "15:07", "17:07", "19:07", "21:07"], days: "Hằng ngày"},
+  {key: "timviecso-dang", grace: 75, name: "Đăng timviecso.vn (4 tin/ngày, mỗi lượt 1 tin)", times: ["9:07", "12:07", "15:07", "18:07"], days: "Hằng ngày"},
   {key: "go-het-han", grace: 75, name: "Gỡ tin hết hạn timviecso.vn", times: ["0:23"], days: "Hằng ngày"},
   {name: "Báo cáo hiệu quả tuần", times: ["8:41"], days: "Thứ Hai"},
   {name: "Bảng điều khiển Claude (cập nhật số liệu)", times: ["12:47", "21:47"], days: "Hằng ngày"},
