@@ -4,7 +4,7 @@ Website riêng chạy trên Cloudflare Workers (gói miễn phí): xem lịch ch
 
 | Phần | Cách làm |
 | --- | --- |
-| Đăng nhập | Mật khẩu (`PASSWORD`, phiên 14 ngày, khóa 15 phút sau 10 lần sai). Có thể bật thêm Cloudflare Access (mã gửi về email) ở bước 5. |
+| Đăng nhập | Tên đăng nhập (`USERNAME`, mặc định `admin`) và mật khẩu (`PASSWORD`, phiên 14 ngày, khóa 15 phút sau 10 lần sai). Có thể bật thêm Cloudflare Access (mã gửi về email) ở bước 5. |
 | Bài đã đăng, lượt xem | Gọi thẳng Buffer GraphQL bằng `BUFFER_API_KEY` |
 | Tin, video timviecso.vn | Gọi thẳng `api.timviecso.vn`; nút Gỡ xóa tin ngay |
 | Duyệt, nhật ký gỡ | Kho KV của Cloudflare |
@@ -27,6 +27,7 @@ Số liệu được giữ 5 phút; nút "Cập nhật số liệu" lấy mới 
    ```
 4. Đặt bí mật và đưa website lên:
    ```bash
+   npx wrangler secret put USERNAME
    npx wrangler secret put PASSWORD
    npx wrangler secret put BUFFER_API_KEY
    npx wrangler deploy

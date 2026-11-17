@@ -92,7 +92,7 @@ async function hmac(secret, msg) {
 async function checkSession(value, env) {
   const [exp, sig] = value.split(".");
   if (!exp || !sig || Number(exp) < Date.now()) return false;
-  return timingSafeEqual(sig, await hmac(env.PASSWORD, `aq:${exp}`));
+  return timingSafeEqual(sig, await hmac(env.PASSWORD, `aq:${String(env.USERNAME || "admin").toLowerCase()}:${exp}`));
 }
 function timingSafeEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -109,20 +109,24 @@ async function login(req, env) {
     const ip = req.headers.get("CF-Connecting-IP") || "?";
     const key = `login-fail:${ip}`;
     const fails = Number(await env.KV.get(key) || 0);
-    if (fails >= 10) error = "Sai mật khẩu quá nhiều lần. Thử lại sau 15 phút.";
+    if (fails >= 10) error = "Đăng nhập sai quá nhiều lần. Thử lại sau 15 phút.";
     else {
       const form = await req.formData();
+      const user = String(form.get("username") || "").trim().toLowerCase();
       const given = String(form.get("password") || "");
-      if (timingSafeEqual(await hmac("cmp", given), await hmac("cmp", env.PASSWORD))) {
+      const wantUser = String(env.USERNAME || "admin").trim().toLowerCase();
+      const okUser = timingSafeEqual(await hmac("cmp", user), await hmac("cmp", wantUser));
+      const okPass = timingSafeEqual(await hmac("cmp", given), await hmac("cmp", env.PASSWORD));
+      if (okUser && okPass) {
         const exp = Date.now() + SESSION_DAYS * 864e5;
-        const value = `${exp}.${await hmac(env.PASSWORD, `aq:${exp}`)}`;
+        const value = `${exp}.${await hmac(env.PASSWORD, `aq:${String(env.USERNAME || "admin").toLowerCase()}:${exp}`)}`;
         return new Response(null, {status: 302, headers: {
           Location: "/",
           "Set-Cookie": `aq_session=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_DAYS * 86400}`,
         }});
       }
       await env.KV.put(key, String(fails + 1), {expirationTtl: 900});
-      error = "Sai mật khẩu.";
+      error = "Sai tên đăng nhập hoặc mật khẩu.";
     }
   }
   return new Response(loginPage(error), {headers: {"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store"}});
@@ -197,9 +201,12 @@ button:focus-visible{outline:3px solid rgba(11,134,232,.45);outline-offset:2px}
     <h2>Đăng nhập</h2>
     <p class="sub">Bảng điều khiển riêng của chủ dự án.</p>
     ${error ? `<div class="err" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg><span>${esc(error)}</span></div>` : ""}
+    <div><label for="un">Tên đăng nhập</label>
+      <div class="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      <input id="un" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Nhập tên đăng nhập" required autofocus></div></div>
     <div><label for="pw">Mật khẩu</label>
       <div class="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-      <input id="pw" name="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required autofocus>
+      <input id="pw" name="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
       <button class="eye" type="button" id="eye" aria-label="Hiện mật khẩu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
     <button class="go" type="submit">Đăng nhập</button>
     <div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Ghi nhớ đăng nhập 14 ngày trên thiết bị này.</div>
