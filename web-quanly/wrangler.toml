@@ -13,7 +13,7 @@ run_worker_first = true
 # Kho lưu lượt duyệt và nhật ký gỡ tin. Thay id bằng id của kho tạo ở bước 3 trong README.
 [[kv_namespaces]]
 binding = "KV"
-id = "THAY_BANG_ID_KHO_KV"
+id = "c2ce0db1cfbe4f0db28843152265971b"
 
 [vars]
 # Email được phép vào (cách nhau bằng dấu phẩy). Đăng nhập do Cloudflare Access lo.
