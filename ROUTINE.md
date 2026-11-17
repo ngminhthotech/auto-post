@@ -73,9 +73,9 @@ Tài khoản TikTok @timviecso.vn đã bị cảnh cáo (thêm 3 lần có thể
 
 ## Đăng timviecso.vn
 
-### Đăng tự động khoảng 2 giờ một tin
+### Đăng tự động 4 tin mỗi ngày
 
-Tác vụ Claude "Đăng timviecso.vn (2 giờ 1 tin)" chạy `python3 -m autopost.careerviet --max 1` mỗi 2 giờ từ 9h đến 21h, và tác vụ "đợt 7:00" chạy `--max 5` (`.github/workflows/quet-tin.yml` chỉ để chạy tay).
+Từ 17/11/2026, chủ dự án giảm còn khoảng 4 tin mỗi ngày: tác vụ Claude "Đăng timviecso.vn (4 tin/ngày: 9h, 12h, 15h, 18h)" chạy `python3 -m autopost.careerviet --max 1` lúc 9:07, 12:07, 15:07 và 18:07 giờ Việt Nam. Đợt 7:00 (5 tin) và lịch 2 giờ một tin cũ đã tắt (`.github/workflows/quet-tin.yml` chỉ để chạy tay).
 
 Trang chủ timviecso.vn có 3 cột theo trường `workType`: Thực tập, Bán thời gian, Toàn thời gian. Từ 14/11/2026, mỗi tin được chọn như sau:
 
