@@ -1,0 +1,13 @@
+{
+  "name": "autopost-quanly",
+  "version": "1.0.0",
+  "description": "Website bảng điều khiển Auto Post",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.163.0"
+  },
+  "private": true
+}

@@ -23,6 +23,7 @@ Dữ liệu và lịch đăng nằm trên Google Drive, thư mục **Auto Post**
 | `ROUTINE.md` | Hướng dẫn cho routine soạn bài và đăng bài |
 | `autopost/dashboard.py` | Gom số liệu cho bảng điều khiển (`snapshot`) và gỡ tin theo yêu cầu từ bảng điều khiển (`go`) |
 | `dashboard/index.html` | Mã nguồn trang bảng điều khiển riêng trên claude.ai |
+| `web-quanly/` | Website bảng điều khiển riêng trên Cloudflare (đăng nhập, gọi Buffer và timviecso.vn trực tiếp), xem `web-quanly/README.md` |
 
 ## Biến môi trường
 

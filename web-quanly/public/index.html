@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Auto Post Tìm Việc Số</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: phòng điều khiển một cột, thanh trên cố định, các bảng dữ liệu cuộn ngang trong khung riêng */
+:root{
+  --bg:#f3f5f4; --panel:#ffffff; --ink:#14201d; --muted:#5b6b67; --line:#d9e1de;
+  --accent:#0b6e63; --accent-ink:#ffffff; --accent-soft:#dcefeb;
+  --ok:#1f7a3d; --ok-soft:#e1f2e6; --warn:#a15c00; --warn-soft:#fbeed8; --bad:#b42318; --bad-soft:#fbe4e1;
+  --fb:#2f5fd0; --tt:#14201d; --yt:#c4302b;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1513; --panel:#161e1b; --ink:#e4ece9; --muted:#93a39e; --line:#2a3632;
+  --accent:#4fc3b1; --accent-ink:#06211d; --accent-soft:#173a34;
+  --ok:#6fd08f; --ok-soft:#173222; --warn:#f0b35a; --warn-soft:#3a2b12; --bad:#f2877c; --bad-soft:#3d1c19;
+  --fb:#7ea2ff; --tt:#e4ece9; --yt:#ff7b74; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1513; --panel:#161e1b; --ink:#e4ece9; --muted:#93a39e; --line:#2a3632;
+  --accent:#4fc3b1; --accent-ink:#06211d; --accent-soft:#173a34;
+  --ok:#6fd08f; --ok-soft:#173222; --warn:#f0b35a; --warn-soft:#3a2b12; --bad:#f2877c; --bad-soft:#3d1c19;
+  --fb:#7ea2ff; --tt:#e4ece9; --yt:#ff7b74; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.chan .c .pill{justify-self:start}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+a{color:var(--accent)}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--panel);border-bottom:1px solid var(--line)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding-block:12px}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.brand h1{font-size:18px;font-weight:700;margin:0;letter-spacing:-.01em}
+.brand .sub{color:var(--muted);font-size:12.5px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px}
+nav.tabs a{padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted);white-space:nowrap;font-weight:500}
+nav.tabs a[aria-current="page"]{background:var(--accent-soft);color:var(--ink)}
+nav.tabs a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--line);background:var(--panel);padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.danger.armed{background:var(--bad);color:var(--panel)}
+.btn[disabled]{opacity:.5;cursor:default}
+main{display:grid;gap:20px;padding-block:20px 48px}
+section[hidden]{display:none}
+.view{display:grid;gap:20px}
+h2{font-size:15px;margin:0;font-weight:600}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px;min-width:0}
+.card-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.card-head .note{color:var(--muted);font-size:12.5px;margin-left:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:2px}
+.kpi .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.kpi .value{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi .hint{color:var(--muted);font-size:12.5px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.msg{padding:10px 12px;border-radius:8px;background:var(--warn-soft);color:var(--ink);border:1px solid var(--line)}
+.msg.bad{background:var(--bad-soft)}
+.msg.ok{background:var(--ok-soft)}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-size:12.5px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap;border:1px solid transparent}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.idle{border-color:var(--line);color:var(--muted)}
+.svc{font-weight:600}
+.svc.facebook{color:var(--fb)} .svc.tiktok{color:var(--tt)} .svc.youtube{color:var(--yt)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:500;background:var(--bg);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td .t{font-weight:500}
+td .s{color:var(--muted);font-size:12.5px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters input[type=search],.filters select,.field input,.field select{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px;min-width:0}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.bulk{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--accent-soft)}
+.bulk input{flex:1 1 220px;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px;min-width:0}
+.tasks{display:grid;gap:12px}
+.task{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:10px;background:var(--panel)}
+.task.off{opacity:.7}
+.task .name{font-weight:600}
+.times{display:flex;flex-wrap:wrap;gap:6px}
+.time{font-family:var(--f-mono);font-size:13px;padding:2px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--line)}
+.editor{display:flex;flex-wrap:wrap;gap:10px;align-items:end;padding-top:10px;border-top:1px dashed var(--line)}
+.field{display:grid;gap:4px;font-size:12px;color:var(--muted)}
+.field input{width:9em}
+.field input.short{width:5em}
+.chart svg{display:block;width:100%;height:auto}
+.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:10px}
+.chart .v{fill:var(--ink)}
+.chart rect.b{fill:var(--accent)}
+.chart rect.today{fill:var(--warn)}
+.chart line{stroke:var(--line)}
+.hbars{display:grid;gap:8px}
+.hbar{display:grid;grid-template-columns:minmax(90px,150px) 1fr auto;gap:10px;align-items:center;font-size:13px}
+.hbar .track{height:10px;background:var(--bg);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.hbar .fill{height:100%;background:var(--accent)}
+.hbar .n{font-variant-numeric:tabular-nums;color:var(--muted)}
+.chan{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.chan .c{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:4px}
+.more{justify-self:center}
+.toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+@media (prefers-reduced-motion:no-preference){.btn,.chip{transition:background .15s,border-color .15s}}
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand"><h1>Auto Post</h1><span class="sub" id="stamp">Đang tải số liệu…</span></div>
+      <button class="btn" id="refresh" type="button">Cập nhật số liệu</button>
+      <a class="btn" href="/logout" id="logout" style="text-decoration:none;color:inherit">Đăng xuất</a>
+    </div>
+    <nav class="tabs" aria-label="Mục">
+      <a href="#tong-quan" data-view="tong-quan">Tổng quan</a>
+      <a href="#lich-chay" data-view="lich-chay">Lịch chạy</a>
+      <a href="#bai-dang" data-view="bai-dang">Bài đã đăng</a>
+      <a href="#tin-timviecso" data-view="tin-timviecso">Tin timviecso.vn</a>
+      <a href="#nhat-ky" data-view="nhat-ky">Nhật ký gỡ tin</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="banner" hidden></div>
+
+  <section class="view" id="v-tong-quan">
+    <div class="kpis" id="kpis">
+      <div class="kpi"><span class="label">Tin đăng hôm nay</span><span class="value">–</span><span class="hint">timviecso.vn</span></div>
+      <div class="kpi"><span class="label">Tin đang có</span><span class="value">–</span><span class="hint">trên timviecso.vn</span></div>
+      <div class="kpi"><span class="label">Lượt xem 30 ngày</span><span class="value">–</span><span class="hint">Facebook, TikTok, YouTube</span></div>
+      <div class="kpi"><span class="label">Bài lỗi</span><span class="value">–</span><span class="hint">trong Buffer</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Bản tin 7:00 hôm nay</h2><span class="note" id="today-note"></span></div>
+      <div class="chan" id="today-bulletin"><span class="muted">Chưa có số liệu.</span></div>
+    </div>
+    <div class="grid2">
+      <div class="card chart">
+        <div class="card-head"><h2>Tin đăng lên timviecso.vn mỗi ngày</h2><span class="note">14 ngày gần nhất</span></div>
+        <div id="chart-days"><span class="muted">Chưa có số liệu.</span></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Hiệu quả theo kênh</h2><span class="note">30 ngày, số liệu Buffer</span></div>
+        <div class="tablebox"><table id="by-service"><thead><tr><th>Kênh</th><th class="num">Bài</th><th class="num">Lượt xem</th><th class="num">TB/bài</th><th class="num">Tương tác</th><th class="num">Lỗi</th></tr></thead><tbody><tr><td colspan="6" class="muted">Chưa có số liệu.</td></tr></tbody></table></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="card-head"><h2>Tin trên trang theo loại hình</h2></div><div class="hbars" id="by-type"></div></div>
+      <div class="card"><div class="card-head"><h2>Tin trên trang theo khu vực</h2><span class="note" id="expiring"></span></div><div class="hbars" id="by-loc"></div></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-lich-chay" hidden>
+    <div class="card">
+      <div class="card-head"><h2>Tác vụ tự động</h2><span class="note">Giờ Việt Nam</span></div>
+      <p class="muted" style="margin:0">Các tác vụ chạy trong Claude nên website chỉ hiện lịch. Muốn đổi giờ hoặc tắt một tác vụ, mở <a id="claude-link" href="#" target="_blank" rel="noopener">bảng điều khiển trên Claude</a> (mục Lịch chạy) hoặc nhắn Claude trong dự án Auto Post.</p>
+      <div class="tasks" id="tasks"><span class="muted">Đang tải…</span></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-bai-dang" hidden>
+    <div class="card">
+      <div class="card-head"><h2>Bài đã đăng qua Buffer</h2><span class="note">30 ngày gần nhất</span></div>
+      <div class="filters" id="post-filters">
+        <button class="chip" type="button" data-f="all" aria-pressed="true">Tất cả</button>
+        <button class="chip" type="button" data-f="facebook" aria-pressed="false">Facebook</button>
+        <button class="chip" type="button" data-f="tiktok" aria-pressed="false">TikTok</button>
+        <button class="chip" type="button" data-f="youtube" aria-pressed="false">YouTube</button>
+        <button class="chip" type="button" data-f="error" aria-pressed="false">Lỗi</button>
+      </div>
+      <div class="tablebox"><table><thead><tr><th>Thời gian</th><th>Kênh</th><th>Bài</th><th class="num">Xem</th><th class="num">Tương tác</th><th>Trạng thái</th><th></th></tr></thead><tbody id="posts"><tr><td colspan="7" class="muted">Chưa có số liệu.</td></tr></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Video bản tin trên trang chủ timviecso.vn</h2></div>
+      <div class="tablebox"><table><thead><tr><th>Ngày thêm</th><th>Tiêu đề</th><th></th></tr></thead><tbody id="videos"><tr><td colspan="3" class="muted">Chưa có số liệu.</td></tr></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-tin-timviecso" hidden>
+    <div class="card">
+      <div class="card-head"><h2>Tin trên timviecso.vn</h2><span class="note" id="jobs-count"></span></div>
+      <div class="filters">
+        <input type="search" id="q" placeholder="Tìm tiêu đề, công ty" aria-label="Tìm tin">
+        <select id="f-type" aria-label="Loại hình"><option value="">Mọi loại hình</option></select>
+        <select id="f-loc" aria-label="Khu vực"><option value="">Mọi khu vực</option></select>
+        <select id="f-state" aria-label="Trạng thái duyệt">
+          <option value="">Mọi trạng thái</option><option value="new">Chưa duyệt</option><option value="ok">Đã duyệt</option>
+        </select>
+      </div>
+      <div class="bulk" id="bulk" hidden>
+        <strong id="bulk-n">0 tin</strong>
+        <button class="btn" id="b-approve" type="button">Duyệt</button>
+        <input id="reason" type="text" placeholder="Lý do gỡ (bắt buộc), ví dụ: sai khu vực" aria-label="Lý do gỡ">
+        <button class="btn danger" id="b-remove" type="button">Gỡ khỏi trang</button>
+        <button class="btn" id="b-clear" type="button">Bỏ chọn</button>
+      </div>
+      <div id="jobs-msg"></div>
+      <div class="tablebox"><table><thead><tr><th><input type="checkbox" id="all" aria-label="Chọn tất cả tin đang hiện"></th><th>Đăng lúc</th><th>Tin</th><th>Khu vực</th><th>Loại hình</th><th>Hạn nộp</th><th>Duyệt</th><th></th></tr></thead><tbody id="jobs"><tr><td colspan="8" class="muted">Chưa có số liệu.</td></tr></tbody></table></div>
+      <button class="btn more" id="more" type="button" hidden>Xem thêm</button>
+    </div>
+  </section>
+
+  <section class="view" id="v-nhat-ky" hidden>
+    <div class="card">
+      <div class="card-head"><h2>Tin đã gỡ</h2><span class="note">100 lần gỡ gần nhất</span></div>
+      <div class="tablebox"><table><thead><tr><th>Lúc</th><th>Tin</th><th>Lý do</th><th>Kết quả</th></tr></thead><tbody id="removed"><tr><td colspan="4" class="muted">Chưa có tin nào được gỡ từ website.</td></tr></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const TZ = "Asia/Ho_Chi_Minh";
+const SVC = {facebook: "Facebook", tiktok: "TikTok", youtube: "YouTube", website: "timviecso.vn"};
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const safeUrl = (u) => /^https:\/\//.test(String(u || "")) ? esc(u) : "";
+const fmt = (n) => Number(n || 0).toLocaleString("vi-VN");
+const ddmm = (s) => s ? `${s.slice(8, 10)}/${s.slice(5, 7)}` + (s.length > 10 ? " " + s.slice(11, 16) : "") : "";
+const vnNow = () => new Date().toLocaleString("sv-SE", {timeZone: TZ}).replace("T", " ");
+
+let snap = null, postFilter = "all", jobLimit = 50, selected = new Set();
+
+const VIEWS = ["tong-quan", "lich-chay", "bai-dang", "tin-timviecso", "nhat-ky"];
+function route() {
+  const v = VIEWS.includes(location.hash.slice(1)) ? location.hash.slice(1) : "tong-quan";
+  for (const id of VIEWS) $("#v-" + id).hidden = id !== v;
+  document.querySelectorAll("nav.tabs a").forEach((a) => a.dataset.view === v ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
+}
+window.addEventListener("hashchange", route);
+
+function banner(text, kind = "") { const b = $("#banner"); b.hidden = !text; b.className = "msg " + kind; b.textContent = text || ""; }
+function note(el, text, kind = "") { el.innerHTML = text ? `<div class="msg ${kind}">${esc(text)}</div>` : ""; }
+
+async function call(path, body) {
+  const r = await fetch(path, body ? {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)} : {});
+  if (r.status === 401) { location.href = "/login"; throw new Error("Hết phiên đăng nhập"); }
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || `Lỗi ${r.status}`);
+  return data;
+}
+
+async function load(fresh) {
+  const b = $("#refresh");
+  b.disabled = true; b.textContent = "Đang tải…";
+  try {
+    snap = await call("/api/data" + (fresh ? "?fresh=1" : ""));
+    renderAll();
+  } catch (e) { banner("Không tải được số liệu: " + e.message, "bad"); }
+  finally { b.disabled = false; b.textContent = "Cập nhật số liệu"; }
+}
+$("#refresh").addEventListener("click", () => load(true));
+
+function renderAll() {
+  const s = snap;
+  $("#stamp").textContent = `Số liệu lúc ${ddmm(s.generated_vn)} · ${s.posts.length} bài · ${s.jobs.length} tin` + (s.user.email ? ` · ${s.user.email}` : "");
+  const errs = Object.entries(s.errors || {});
+  banner(errs.length ? "Một phần số liệu bị lỗi: " + errs.map(([k, v]) => `${k}: ${v}`).join("; ") : "", "bad");
+  if (s.claude_panel) $("#claude-link").href = s.claude_panel;
+  renderOverview(); renderSchedule(); renderPosts(); renderJobs(); renderLog();
+}
+
+function renderOverview() {
+  const st = snap.stats, k = document.querySelectorAll("#kpis .value");
+  const views = Object.values(st.by_service).reduce((a, b) => a + b.views, 0);
+  const errors = snap.posts.filter((p) => p.status === "error").length;
+  k[0].textContent = fmt(st.jobs_today); k[1].textContent = fmt(st.jobs_total); k[2].textContent = fmt(views); k[3].textContent = fmt(errors);
+  k[3].style.color = errors ? "var(--bad)" : "";
+
+  // Bản tin hôm nay: bài Buffer hẹn hoặc đăng từ 6:00 đến 9:00 hôm nay, video trang chủ thêm hôm nay.
+  const today = vnNow().slice(0, 10);
+  const morning = (p) => p.time_vn && p.time_vn.slice(0, 10) === today && p.time_vn.slice(11) >= "06:00" && p.time_vn.slice(11) <= "09:00";
+  const vid = snap.videos.find((v) => (v.created_vn || "").slice(0, 10) === today);
+  const anyToday = snap.posts.some(morning) || vid;
+  $("#today-note").textContent = anyToday ? "" : "Chưa có bản tin hôm nay.";
+  $("#today-bulletin").innerHTML = ["facebook", "tiktok", "youtube", "website"].map((ch) => {
+    const p = ch === "website" ? null : snap.posts.filter((x) => x.service === ch && morning(x))[0];
+    const status = ch === "website" ? (vid ? "sent" : "") : p ? p.status : "";
+    const link = ch === "website" ? vid && vid.url : p && p.link;
+    return `<div class="c"><span class="svc ${ch}">${SVC[ch]}</span>${pill(status)}
+      <span class="s muted">${p ? fmt(p.views) + " lượt xem" : vid && ch === "website" ? "đã thêm vào trang chủ" : "&nbsp;"}</span>
+      ${safeUrl(link) ? `<a href="${safeUrl(link)}" target="_blank" rel="noopener">Mở bài</a>` : '<span class="muted">Chưa có link</span>'}</div>`;
+  }).join("");
+
+  const days = st.jobs_per_day, max = Math.max(1, ...days.map((d) => d.count));
+  const W = 560, H = 190, top = 18, bottom = 24, bw = W / days.length;
+  const y = (v) => top + (H - top - bottom) * (1 - v / max);
+  $("#chart-days").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Số tin đăng mỗi ngày">
+    <line x1="0" x2="${W}" y1="${H - bottom}" y2="${H - bottom}"/>
+    ${days.map((d, i) => `<rect class="b ${d.date === today ? "today" : ""}" x="${i * bw + 4}" y="${y(d.count)}" width="${bw - 8}" height="${H - bottom - y(d.count)}" rx="3"><title>${ddmm(d.date)}: ${d.count} tin</title></rect>
+      <text class="v" x="${i * bw + bw / 2}" y="${y(d.count) - 5}" text-anchor="middle">${d.count}</text>
+      <text x="${i * bw + bw / 2}" y="${H - 8}" text-anchor="middle">${ddmm(d.date)}</text>`).join("")}
+  </svg>`;
+
+  const rows = Object.entries(st.by_service);
+  $("#by-service tbody").innerHTML = rows.length ? rows.map(([k, v]) => `<tr><td class="svc ${esc(k)}">${esc(SVC[k] || k)}</td><td class="num">${fmt(v.posts)}</td><td class="num">${fmt(v.views)}</td><td class="num">${fmt(v.posts ? Math.round(v.views / v.posts) : 0)}</td><td class="num">${fmt(v.engagement)}</td><td class="num">${v.errors ? `<span class="pill bad">${v.errors}</span>` : "0"}</td></tr>`).join("") : '<tr><td colspan="6" class="muted">Không có bài nào.</td></tr>';
+  hbars("#by-type", st.jobs_by_type); hbars("#by-loc", st.jobs_by_location);
+  $("#expiring").textContent = st.jobs_expiring_3d ? `${st.jobs_expiring_3d} tin hết hạn trong 3 ngày` : "";
+}
+function hbars(sel, obj) {
+  const e = Object.entries(obj).sort((a, b) => b[1] - a[1]), max = Math.max(1, ...e.map((x) => x[1]));
+  $(sel).innerHTML = e.map(([k, v]) => `<div class="hbar"><span>${esc(k)}</span><div class="track"><div class="fill" style="width:${(v / max) * 100}%"></div></div><span class="n">${fmt(v)}</span></div>`).join("");
+}
+function pill(status) {
+  const m = {sent: ["ok", "Đã đăng"], scheduled: ["idle", "Đã hẹn giờ"], sending: ["warn", "Đang gửi"], error: ["bad", "Lỗi"]};
+  const [c, t] = m[status] || ["idle", "Chưa đăng"];
+  return `<span class="pill ${c}">${t}</span>`;
+}
+
+function renderSchedule() {
+  $("#tasks").innerHTML = snap.schedule.map((t) => `<div class="task"><div class="card-head"><span class="name">${esc(t.name)}</span>${t.note ? `<span class="note">${esc(t.note)}</span>` : ""}</div>
+    <div class="card-head"><span>${esc(t.days)}:</span><span class="times">${t.times.map((x) => `<span class="time">${esc(x)}</span>`).join("")}</span></div></div>`).join("");
+}
+
+function renderPosts() {
+  const list = snap.posts.filter((p) => postFilter === "all" || (postFilter === "error" ? p.status === "error" : p.service === postFilter));
+  $("#posts").innerHTML = list.length ? list.map((p) => `<tr>
+    <td class="mono">${ddmm(p.time_vn)}</td><td class="svc ${esc(p.service)}">${esc(SVC[p.service] || p.service)}</td>
+    <td><div class="t">${esc(p.title)}</div>${p.error ? `<div class="s" style="color:var(--bad)">${esc(p.error)}</div>` : ""}</td>
+    <td class="num">${fmt(p.views)}</td><td class="num">${fmt(p.engagement)}</td><td>${pill(p.status)}</td>
+    <td>${safeUrl(p.link) ? `<a href="${safeUrl(p.link)}" target="_blank" rel="noopener">Mở</a>` : ""}</td></tr>`).join("") : '<tr><td colspan="7" class="muted">Không có bài nào.</td></tr>';
+  $("#videos").innerHTML = snap.videos.length ? snap.videos.map((v) => `<tr><td class="mono">${ddmm(v.created_vn)}</td><td>${esc(v.title)}</td><td>${safeUrl(v.url) ? `<a href="${safeUrl(v.url)}" target="_blank" rel="noopener">YouTube</a>` : ""}</td></tr>`).join("") : '<tr><td colspan="3" class="muted">Chưa có video.</td></tr>';
+}
+$("#post-filters").addEventListener("click", (e) => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  postFilter = b.dataset.f;
+  document.querySelectorAll("#post-filters .chip").forEach((c) => c.setAttribute("aria-pressed", c === b));
+  if (snap) renderPosts();
+});
+
+const approved = (j) => !!snap.approvals[j.id];
+function filteredJobs() {
+  const q = $("#q").value.trim().toLowerCase(), t = $("#f-type").value, l = $("#f-loc").value, s = $("#f-state").value;
+  return snap.jobs.filter((j) => (!q || `${j.title} ${j.employer}`.toLowerCase().includes(q)) && (!t || j.workType === t) && (!l || j.location === l) && (!s || (s === "ok") === approved(j)));
+}
+function fillSelect(sel, values) {
+  const el = $(sel), cur = el.value;
+  el.length = 1;
+  for (const v of [...new Set(values)].filter(Boolean).sort()) el.add(new Option(v, v));
+  el.value = cur;
+}
+function renderJobs() {
+  fillSelect("#f-type", snap.jobs.map((j) => j.workType));
+  fillSelect("#f-loc", snap.jobs.map((j) => j.location));
+  const list = filteredJobs(), today = vnNow().slice(0, 10);
+  $("#jobs-count").textContent = `${list.length} tin đang hiện · ${snap.jobs.filter(approved).length} đã duyệt`;
+  $("#jobs").innerHTML = list.length ? list.slice(0, jobLimit).map((j) => `<tr>
+      <td><input type="checkbox" data-id="${esc(j.id)}" ${selected.has(j.id) ? "checked" : ""} aria-label="Chọn tin"></td>
+      <td class="mono">${ddmm(j.created_vn)}</td>
+      <td><div class="t">${esc(j.title)}</div><div class="s">${esc(j.employer)} · ${esc(j.salary)}</div></td>
+      <td>${esc(j.location)}</td><td>${esc(j.workType)}</td>
+      <td class="mono" ${j.deadline && j.deadline < today ? 'style="color:var(--bad)"' : ""}>${ddmm(j.deadline)}</td>
+      <td>${approved(j) ? '<span class="pill ok">Đã duyệt</span>' : '<span class="pill idle">Chưa duyệt</span>'}</td>
+      <td style="white-space:nowrap">${safeUrl(j.url) ? `<a href="${safeUrl(j.url)}" target="_blank" rel="noopener">Trên trang</a>` : ""}${safeUrl(j.source) ? ` · <a href="${safeUrl(j.source)}" target="_blank" rel="noopener">Tin gốc</a>` : ""}</td></tr>`).join("") : '<tr><td colspan="8" class="muted">Không có tin nào khớp bộ lọc.</td></tr>';
+  $("#more").hidden = list.length <= jobLimit;
+  $("#all").checked = false;
+  renderBulk();
+}
+function renderBulk() { $("#bulk").hidden = !selected.size; $("#bulk-n").textContent = `${selected.size} tin`; disarm(); }
+["#q", "#f-type", "#f-loc", "#f-state"].forEach((s) => $(s).addEventListener("input", () => { jobLimit = 50; if (snap) renderJobs(); }));
+$("#more").addEventListener("click", () => { jobLimit += 50; renderJobs(); });
+$("#jobs").addEventListener("change", (e) => { const id = e.target.dataset.id; if (!id) return; e.target.checked ? selected.add(id) : selected.delete(id); renderBulk(); });
+$("#all").addEventListener("change", (e) => { for (const j of filteredJobs().slice(0, jobLimit)) e.target.checked ? selected.add(j.id) : selected.delete(j.id); const c = e.target.checked; renderJobs(); $("#all").checked = c; });
+$("#b-clear").addEventListener("click", () => { selected.clear(); renderJobs(); });
+
+$("#b-approve").addEventListener("click", async () => {
+  const ids = [...selected], b = $("#b-approve");
+  b.disabled = true;
+  try {
+    await call("/api/approve", {ids});
+    for (const id of ids) snap.approvals[id] = vnNow();
+    note($("#jobs-msg"), `Đã duyệt ${ids.length} tin.`, "ok");
+    selected.clear(); renderJobs();
+  } catch (e) { note($("#jobs-msg"), "Chưa lưu được lượt duyệt: " + e.message, "bad"); }
+  finally { b.disabled = false; }
+});
+
+let armTimer = null;
+function disarm() { const b = $("#b-remove"); b.classList.remove("armed"); b.textContent = "Gỡ khỏi trang"; clearTimeout(armTimer); }
+$("#b-remove").addEventListener("click", async () => {
+  const b = $("#b-remove"), reason = $("#reason").value.trim().replace(/\s+/g, " ").slice(0, 200);
+  if (!reason) { note($("#jobs-msg"), "Ghi lý do gỡ trước khi bấm Gỡ."); $("#reason").focus(); return; }
+  if (!b.classList.contains("armed")) { b.classList.add("armed"); b.textContent = `Bấm lần nữa để gỡ ${selected.size} tin`; armTimer = setTimeout(disarm, 6000); return; }
+  disarm();
+  b.disabled = true;
+  try {
+    const r = await call("/api/remove", {ids: [...selected], reason});
+    const done = r.results.filter((x) => x.status === "da_go").length, bad = r.results.filter((x) => x.status === "loi");
+    note($("#jobs-msg"), `Đã gỡ ${done} tin.` + (bad.length ? ` ${bad.length} tin gỡ lỗi: ${bad[0].error}` : ""), bad.length ? "bad" : "ok");
+    selected.clear(); $("#reason").value = "";
+    await load(false);
+  } catch (e) { note($("#jobs-msg"), "Chưa gỡ được: " + e.message, "bad"); }
+  finally { b.disabled = false; }
+});
+
+function renderLog() {
+  const rm = [...snap.removed].reverse();
+  const label = {da_go: ["ok", "Đã gỡ"], khong_con_tren_trang: ["idle", "Đã không còn"], loi: ["bad", "Lỗi"]};
+  $("#removed").innerHTML = rm.length ? rm.map((r) => { const [c, t] = label[r.status] || ["idle", r.status]; return `<tr><td class="mono">${ddmm(r.time_vn)}</td><td><div class="t">${esc(r.title || r.id)}</div><div class="s">${esc(r.employer)}</div></td><td>${esc(r.reason)}</td><td><span class="pill ${c}">${t}</span>${r.error ? `<div class="s">${esc(r.error)}</div>` : ""}</td></tr>`; }).join("") : '<tr><td colspan="4" class="muted">Chưa có tin nào được gỡ từ website.</td></tr>';
+}
+
+route();
+load(false);
+</script>
+</body>
+</html>

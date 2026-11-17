@@ -1,0 +1,32 @@
+# Website bảng điều khiển Auto Post trên Cloudflare Workers (gói miễn phí).
+# Hướng dẫn cài đặt: web-quanly/README.md
+name = "autopost-quanly"
+main = "src/worker.js"
+compatibility_date = "2026-10-01"
+
+# Mọi yêu cầu (kể cả trang HTML) đi qua worker trước để kiểm tra đăng nhập.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+# Kho lưu lượt duyệt và nhật ký gỡ tin. Thay id bằng id của kho tạo ở bước 3 trong README.
+[[kv_namespaces]]
+binding = "KV"
+id = "THAY_BANG_ID_KHO_KV"
+
+[vars]
+# Email được phép vào (cách nhau bằng dấu phẩy). Đăng nhập do Cloudflare Access lo.
+ALLOWED_EMAILS = ""
+# Tên nhóm Zero Trust (phần trước .cloudflareaccess.com) và mã AUD của ứng dụng Access.
+ACCESS_TEAM = ""
+ACCESS_AUD = ""
+# Tổ chức Buffer của Tìm Việc Số (channels.json).
+BUFFER_ORG = "6ae9982428d321b11c4085f7"
+# Link bảng điều khiển trên claude.ai, nơi đổi giờ chạy tác vụ.
+CLAUDE_PANEL = "https://claude.ai/artifact/8X8Q9SMXaf8TnAnhdmLEEW"
+
+# Bí mật (đặt bằng `npx wrangler secret put <TÊN>` hoặc trong Cloudflare, không ghi vào đây):
+#   BUFFER_API_KEY   khóa API Buffer
+#   TIMVIECSO_TOKEN  chỉ khi API timviecso.vn đòi khóa
+#   PASSWORD         mật khẩu dự phòng, chỉ dùng khi chưa bật Cloudflare Access
