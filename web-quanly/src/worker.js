@@ -162,29 +162,30 @@ function loginPage(error) {
 @media (prefers-color-scheme:dark){:root{--ink:#e8edf8;--muted:#9aa6c2;--line:#25304d;--bg:#0b1020;--panel:#111830;--field:#0e1529;--bad:#ff8a80;--bad-bg:#3a1714;color-scheme:dark}}
 *{box-sizing:border-box}html,body{height:100%}
 body{margin:0;font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
-.brand{position:relative;overflow:hidden;color:#fff;padding:48px 56px;display:flex;flex-direction:column;justify-content:space-between;
+.brand{position:relative;overflow:hidden;color:#fff;padding:48px clamp(40px,5vw,72px);display:flex;flex-direction:column;justify-content:space-between;
 background:radial-gradient(800px 520px at 100% 0%,rgba(11,134,232,.85),transparent 62%),linear-gradient(150deg,#0813df 0%,#0a1ec4 55%,#0b3fd6 100%)}
-.sq{position:absolute;background:#ff7f14;z-index:0}.sq.a{width:96px;height:96px;right:-24px;top:150px}.sq.b{width:28px;height:28px;right:96px;top:120px;opacity:.9}.sq.c{width:260px;height:260px;right:-120px;bottom:-130px;background:rgba(255,255,255,.07)}
 .brand::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(180deg,#000,transparent 85%);pointer-events:none}
 .logo{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-.logo .tile{width:76px;height:58px;border-radius:16px;background:#fff;display:grid;place-items:center;box-shadow:0 10px 28px rgba(0,0,0,.22)}.logo .tile img{width:60px;height:auto}
+.logo .tile{width:72px;height:56px;border-radius:14px;background:#fff;display:grid;place-items:center;box-shadow:0 8px 22px rgba(6,20,80,.28)}.logo .tile img{width:60px;height:auto}
 .logo b{display:block;font-size:19px;letter-spacing:-.01em}.logo span{font-size:13px;opacity:.75}
-.hero{position:relative;z-index:1;max-width:520px}
+.hero{position:relative;z-index:1;max-width:560px}
 .hero h1{font-size:clamp(28px,3.2vw,40px);line-height:1.15;letter-spacing:-.02em;margin:0 0 14px;font-weight:800;text-wrap:balance}
-.hero h1 em{font-style:normal;color:#ffb36b}
+.hero h1 em{font-style:normal;color:#ff9a45}
 .hero .kicker{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;opacity:.9}.hero .kicker::before{content:"";width:10px;height:10px;background:#ff7f14}
 .hero p{margin:0;font-size:15.5px;line-height:1.6;opacity:.82;max-width:44ch}
 .feats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:560px}
-.feat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px;backdrop-filter:blur(6px)}
-.feat b{display:block;font-size:14px;margin-bottom:2px}.feat span{font-size:12.5px;opacity:.75;line-height:1.45}
+.feat{display:grid;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px;backdrop-filter:blur(6px)}
+.feat i{width:8px;height:8px;background:#ff7f14;display:block}.feat b{display:block;font-size:14px}.feat span{font-size:12.5px;opacity:.75;line-height:1.45}
 .side{display:grid;place-items:center;padding:40px max(24px,env(safe-area-inset-right))}
-form{width:min(400px,100%);display:grid;gap:18px}
+form{width:min(400px,100%);display:grid;gap:18px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:36px 32px;box-shadow:0 1px 2px rgba(15,27,61,.04),0 12px 40px rgba(15,27,61,.08)}
+@media (max-width:480px){form{padding:28px 20px;border-radius:16px}}
 .mlogo{display:none;align-items:center;gap:12px}.mlogo img{width:64px;height:auto}
 h2{margin:0;font-size:26px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}h2::after{content:"";width:10px;height:10px;background:#ff7f14}.sub{margin:-10px 0 4px;color:var(--muted);font-size:14.5px}
 label{font-size:13.5px;font-weight:600}
 .field{position:relative;margin-top:6px}
 .field svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
 input{width:100%;font:inherit;font-size:15px;padding:13px 46px 13px 42px;border:1.5px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);transition:border-color .15s,box-shadow .15s}
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 60px var(--field) inset;-webkit-text-fill-color:var(--ink);caret-color:var(--ink);transition:background-color 9999s}
 input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px rgba(8,19,223,.12)}
 .eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--muted);cursor:pointer;padding:8px;border-radius:8px}
 .eye:hover{color:var(--ink)}.eye svg{position:static;transform:none}
@@ -199,14 +200,13 @@ button:focus-visible{outline:3px solid rgba(11,134,232,.45);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body>
 <aside class="brand">
-  <span class="sq a"></span><span class="sq b"></span>
   <div class="logo"><span class="tile"><img src="/logo-d24.png" alt="Design24"></span><div><b>Học viện Design24</b><span>Auto Post · Tìm Việc Số</span></div></div>
   <div class="hero"><div class="kicker">Bảng điều khiển</div><h1>Toàn bộ kênh đăng tin, <em>trong một màn hình.</em></h1>
   <p>Theo dõi bản tin 7:00 trên Facebook, TikTok, YouTube, tin tuyển dụng trên timviecso.vn và lịch chạy tự động mỗi ngày.</p></div>
   <div class="feats">
-    <div class="feat"><b>Bản tin 7:00</b><span>Trạng thái từng kênh, link và lượt xem</span></div>
-    <div class="feat"><b>Tin tuyển dụng</b><span>Duyệt và gỡ tin ngay trên trang</span></div>
-    <div class="feat"><b>Số liệu 30 ngày</b><span>Lượt xem, tương tác, bài lỗi</span></div>
+    <div class="feat"><i></i><b>Bản tin 7:00</b><span>Trạng thái từng kênh, link và lượt xem</span></div>
+    <div class="feat"><i></i><b>Tin tuyển dụng</b><span>Duyệt và gỡ tin ngay trên trang</span></div>
+    <div class="feat"><i></i><b>Số liệu 30 ngày</b><span>Lượt xem, tương tác, bài lỗi</span></div>
   </div>
 </aside>
 <main class="side">
