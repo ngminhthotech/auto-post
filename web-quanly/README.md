@@ -9,6 +9,9 @@ Website riêng chạy trên Cloudflare Workers (gói miễn phí): xem lịch ch
 | Tin, video timviecso.vn | Gọi thẳng `api.timviecso.vn`; nút Gỡ xóa tin ngay |
 | Duyệt, nhật ký gỡ | Kho KV của Cloudflare |
 | Lịch chạy | Chỉ hiển thị (các tác vụ chạy trong Claude); đổi giờ trên bảng điều khiển Claude |
+| Cảnh báo, lượt chạy | Tác vụ báo kết quả qua `POST /api/agent/run` (khóa `AGENT_TOKEN`, lệnh `python3 -m autopost.control`); cron 30 phút tìm lượt bị lỡ, bài Buffer lỗi, khóa Buffer hỏng; gửi Telegram nếu đặt `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` |
+| Tạm dừng, chặn | Lưu ở KV `control`; tác vụ đọc qua `GET /api/agent/config` trước mỗi lượt đăng |
+| Báo cáo | Tuần này so với tuần trước, giờ đăng hiệu quả, top 10, xuất CSV mở bằng Excel |
 
 Số liệu được giữ 5 phút; nút "Cập nhật số liệu" lấy mới ngay.
 
@@ -30,6 +33,7 @@ Số liệu được giữ 5 phút; nút "Cập nhật số liệu" lấy mới 
    npx wrangler secret put USERNAME
    npx wrangler secret put PASSWORD
    npx wrangler secret put BUFFER_API_KEY
+   npx wrangler secret put AGENT_TOKEN   # chép cùng chuỗi vào /mnt/project-files/auto-post/dashboard/agent-token.txt
    npx wrangler deploy
    ```
    Website ở địa chỉ `https://autopost-quanly.<tên-tài-khoản>.workers.dev`.
@@ -43,3 +47,5 @@ npx wrangler dev
 ```
 
 Mở http://localhost:8787. Nút Gỡ khi chạy thử vẫn gỡ tin thật trên timviecso.vn.
+
+Ghi chú: KV của Cloudflare có thể chậm khoảng 1 phút mới đồng bộ, nên bật tạm dừng hay danh sách chặn có hiệu lực sau tối đa khoảng 1 phút. API timviecso.vn chưa có lệnh sửa tin, nên website chưa gia hạn được tin.

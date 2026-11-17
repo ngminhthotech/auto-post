@@ -29,7 +29,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from autopost import buffer, media
+from autopost import buffer, control, media
 
 ROOT = Path(__file__).resolve().parent.parent
 PROJECT_FILES = Path("/mnt/project-files/auto-post")
@@ -127,6 +127,11 @@ def dang(folder, date, at="auto"):
     result = {"at": when or "ngay", "urls": urls, "posts": {}}
     for name, args in jobs.items():
         out_file = folder / f"ket-qua-{name}.json"
+        stop = control.paused(name)
+        if stop and not _ok(out_file):
+            # Tạm dừng trên website quản lý: không đăng kênh này, không ghi ket-qua để lần sau còn đăng được.
+            result["posts"][name] = {"ok": True, "skipped": "tạm dừng trên website quản lý", "tam_dung": stop}
+            continue
         if _ok(out_file):
             # Không bao giờ đăng lại kênh đã đăng thành công (TikTok trùng video sẽ bị cảnh cáo).
             result["posts"][name] = {"skipped": "đã đăng trước đó", **json.loads(out_file.read_text(encoding="utf-8"))}
@@ -147,6 +152,11 @@ def dang(folder, date, at="auto"):
         result["posts"][name] = data
     result["saved"] = luu(folder, date)
     result["ok"] = all(p.get("ok") for p in result["posts"].values())
+    parts = []
+    for name, p in result["posts"].items():
+        state = "tạm dừng" if p.get("tam_dung") else "đã đăng trước" if p.get("skipped") else "OK" if p.get("ok") else f"LỖI {p.get('error') or ''}".strip()
+        parts.append(f"{name}: {state}")
+    control.report("bantin", result["ok"], f"Bản tin {date}: " + "; ".join(parts))
     return result
 
 
@@ -205,6 +215,8 @@ def main(argv=None):
     except (subprocess.CalledProcessError, buffer.BufferError) as exc:
         err = getattr(exc, "stderr", None) or str(exc)
         print(json.dumps({"ok": False, "error": str(err)[-800:]}, ensure_ascii=False))
+        if args.cmd == "dang":
+            control.report("bantin", False, f"Bản tin {args.date}: {str(err)[-300:]}")
         return 1
     print(json.dumps(out, ensure_ascii=False, indent=1))
     return 0 if out.get("ok", True) else 1

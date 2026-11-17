@@ -51,6 +51,7 @@ svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .nav a:hover{background:var(--brand-soft);color:var(--brand);text-decoration:none}
 .nav a[aria-current="page"]{background:var(--grad);color:#fff;box-shadow:0 8px 18px rgba(8,19,223,.25)}
 .nav a[aria-current="page"]::after{content:"";position:absolute;right:10px;top:50%;width:8px;height:8px;margin-top:-4px;background:var(--orange)}
+.nav .count:empty{display:none}
 .nav .count{margin-left:auto;font-size:11.5px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0 8px;font-variant-numeric:tabular-nums}
 .nav a[aria-current="page"] .count{background:rgba(255,255,255,.2);border-color:transparent;color:#fff;margin-right:14px}
 .side .sp{flex:1}
@@ -213,6 +214,34 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
 @keyframes sk{to{background-position:-200% 0}}
 .scrim{display:none}
 
+/* thêm: công tắc, chip, nhật ký chạy, 2 bước */
+.sw{position:relative;width:46px;height:26px;flex:none;border-radius:999px;border:0;background:var(--line);cursor:pointer;transition:background .15s}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.sw[aria-checked="true"]{background:var(--bad)}.sw[aria-checked="true"]::after{transform:translateX(20px)}
+.sw[disabled]{opacity:.5;cursor:default}
+.ctl{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px dashed var(--line)}.ctl:last-child{border-bottom:0}
+.ctl .nm{font-weight:600}.ctl .st{font-size:12.5px;color:var(--muted)}.ctl .st.on{color:var(--bad);font-weight:600}
+.ctl .r{margin-left:auto;display:flex;align-items:center;gap:10px}
+.ctl>div:not(.r){flex:1;min-width:0}
+@media (max-width:640px){.ctl{flex-wrap:wrap}.ctl .r{width:100%;justify-content:space-between}.ctl .r .sel{flex:1}}
+.ctl.master{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 6px 4px 12px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);font-size:13px}
+.chip button{border:0;background:none;cursor:pointer;color:var(--faint);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:15px;line-height:1}
+.chip button:hover{background:var(--bad-soft);color:var(--bad)}
+.addrow{display:flex;gap:8px;flex-wrap:wrap}.addrow input{flex:1 1 220px;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}
+.al{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed var(--line)}.al:last-child{border-bottom:0}
+.al .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;flex:none}
+.al .t{font-weight:600}.al .d{color:var(--muted);font-size:12.5px;word-break:break-word}.al .r{margin-left:auto;display:flex;gap:8px;align-items:center}
+.slots{display:grid;gap:8px}
+.slot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}
+.slot .tm{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pill{font:500 11.5px var(--mono);padding:2px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--muted)}
+.pill.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}.pill.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.pill.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.nav .count.hot{background:var(--bad);border-color:var(--bad);color:#fff}
+.delta{font-size:12px;font-weight:600}.delta.up{color:var(--ok)}.delta.down{color:var(--bad)}.delta.flat{color:var(--muted)}
+.bulk label.blk{display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap}
 @media (max-width:1200px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.bul{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:1000px){.g-2-1,.g-1-1{grid-template-columns:1fr}}
 @media (max-width:860px){
@@ -251,6 +280,13 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13-8z" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
   <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" /><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+  <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15v3M12 10v8M17 6v12"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
   <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></symbol>
 </svg>
 
@@ -262,6 +298,9 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
       <a href="#lich-chay" data-view="lich-chay"><svg class="i"><use href="#i-cal"/></svg>Lịch chạy</a>
       <a href="#bai-dang" data-view="bai-dang"><svg class="i"><use href="#i-send"/></svg>Bài đã đăng<span class="count" id="n-posts"></span></a>
       <a href="#tin-timviecso" data-view="tin-timviecso"><svg class="i"><use href="#i-brief"/></svg>Tin tuyển dụng<span class="count" id="n-jobs"></span></a>
+      <a href="#nhat-ky-chay" data-view="nhat-ky-chay"><svg class="i"><use href="#i-pulse"/></svg>Cảnh báo, lượt chạy<span class="count" id="n-alerts"></span></a>
+      <a href="#bao-cao" data-view="bao-cao"><svg class="i"><use href="#i-chart"/></svg>Báo cáo</a>
+      <a href="#dieu-khien" data-view="dieu-khien"><svg class="i"><use href="#i-pause"/></svg>Tạm dừng, chặn<span class="count" id="n-paused"></span></a>
       <a href="#nhat-ky" data-view="nhat-ky"><svg class="i"><use href="#i-log"/></svg>Nhật ký gỡ tin</a>
     </nav>
     <div class="sp"></div>
@@ -285,6 +324,7 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
 
       <!-- TỔNG QUAN -->
       <section id="v-tong-quan" class="grid">
+        <div id="ov-alerts" hidden></div>
         <div class="grid g4">
           <div class="card kpi"><div class="row"><span class="ic blue"><svg class="i"><use href="#i-brief"/></svg></span><span class="lb">Tin đăng hôm nay</span></div>
             <div class="val sk" id="k-today">00</div><div class="foot" id="k-today-f">&nbsp;</div><svg class="spark" id="sp-jobs"></svg></div>
@@ -353,6 +393,7 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
               <button type="button" data-f="error" aria-pressed="false">Lỗi</button>
             </div>
             <label class="search"><svg class="i"><use href="#i-search"/></svg><input id="pq" type="search" placeholder="Tìm trong bài đăng" aria-label="Tìm bài"></label>
+            <button class="btn" type="button" id="x-posts" style="margin-left:auto"><svg class="i"><use href="#i-down"/></svg>Xuất Excel</button>
           </div>
           <div class="tbox"><table><thead><tr><th>Bài đăng</th><th>Thời gian</th><th class="num">Lượt xem</th><th class="num">Tương tác</th><th>Trạng thái</th><th></th></tr></thead><tbody id="posts"></tbody></table></div>
         </div>
@@ -370,12 +411,21 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
             <label class="search"><svg class="i"><use href="#i-search"/></svg><input id="q" type="search" placeholder="Tìm tiêu đề, công ty" aria-label="Tìm tin"></label>
             <select class="sel" id="f-type" aria-label="Loại hình"><option value="">Mọi loại hình</option></select>
             <select class="sel" id="f-loc" aria-label="Khu vực"><option value="">Mọi khu vực</option></select>
+            <select class="sel" id="f-src" aria-label="Nguồn tin"><option value="">Mọi nguồn</option></select>
+            <select class="sel" id="f-sort" aria-label="Sắp xếp"><option value="new">Mới đăng trước</option><option value="old">Cũ trước</option><option value="dl">Hạn nộp gần nhất</option><option value="co">Theo công ty</option></select>
+          </div>
+          <div class="toolbar">
             <div class="seg" id="state-seg">
               <button type="button" data-s="" aria-pressed="true">Tất cả</button>
               <button type="button" data-s="new" aria-pressed="false">Chưa duyệt</button>
               <button type="button" data-s="ok" aria-pressed="false">Đã duyệt</button>
               <button type="button" data-s="soon" aria-pressed="false">Sắp hết hạn</button>
+              <button type="button" data-s="late" aria-pressed="false">Quá hạn</button>
+              <button type="button" data-s="dup" aria-pressed="false">Tin trùng</button>
+              <button type="button" data-s="blk" aria-pressed="false">Bị chặn</button>
+              <button type="button" data-s="today" aria-pressed="false">Đăng hôm nay</button>
             </div>
+            <button class="btn" type="button" id="x-jobs" style="margin-left:auto"><svg class="i"><use href="#i-down"/></svg>Xuất Excel</button>
           </div>
           <div class="tbox"><table><thead><tr><th style="width:36px"><input type="checkbox" id="all" aria-label="Chọn cả trang"></th><th>Tin tuyển dụng</th><th>Khu vực</th><th>Loại hình</th><th>Hạn nộp</th><th>Đăng lúc</th><th>Duyệt</th><th></th></tr></thead><tbody id="jobs"></tbody></table></div>
           <div class="pager"><span id="pg-info"></span><div class="pg"><button class="btn" id="prev" type="button">Trước</button><button class="btn" id="next" type="button">Sau</button></div></div>
@@ -384,9 +434,69 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
           <b id="bulk-n">0 tin</b>
           <button class="btn" id="b-approve" type="button"><svg class="i"><use href="#i-check"/></svg>Duyệt</button>
           <input id="reason" type="text" placeholder="Lý do gỡ, ví dụ: sai khu vực" aria-label="Lý do gỡ">
+          <label class="blk"><input type="checkbox" id="b-block"> Chặn luôn nhà tuyển dụng</label>
           <button class="btn danger" id="b-remove" type="button"><svg class="i"><use href="#i-trash"/></svg><span>Gỡ khỏi trang</span></button>
           <button class="btn ghost" id="b-clear" type="button">Bỏ chọn</button>
         </div>
+      </section>
+
+      <!-- CẢNH BÁO, LƯỢT CHẠY -->
+      <section id="v-nhat-ky-chay" class="grid" hidden>
+        <div class="card">
+          <div class="card-h"><h2>Cảnh báo cần xem</h2><span class="hint" id="al-hint"></span><div class="right">
+            <button class="btn" type="button" id="wd-run"><svg class="i"><use href="#i-ref"/></svg>Kiểm tra ngay</button>
+            <button class="btn" type="button" id="al-ack-all"><svg class="i"><use href="#i-check"/></svg>Đã xem tất cả</button></div></div>
+          <div class="card-b" id="alerts"></div>
+        </div>
+        <div class="grid g-1-1">
+          <div class="card"><div class="card-h"><h2>Lượt chạy hôm nay</h2><span class="hint">theo lịch, giờ Việt Nam</span></div><div class="card-b slots" id="slots"></div></div>
+          <div class="card"><div class="card-h"><h2>Cách hoạt động</h2></div><div class="card-b" style="color:var(--muted);display:grid;gap:10px;font-size:13.5px">
+            <div>Mỗi tác vụ chạy xong tự báo kết quả về đây (thành công, lỗi, hoặc bỏ qua vì đang tạm dừng).</div>
+            <div>Cứ 30 phút website tự kiểm tra: tác vụ nào quá giờ mà chưa báo, bài nào lỗi trên Buffer, khóa Buffer còn dùng được không. Có vấn đề thì hiện cảnh báo đỏ ở đây và trên trang Tổng quan.</div>
+            <div id="tg-note"></div>
+          </div></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Nhật ký chạy</h2><span class="hint">150 lượt gần nhất</span><div class="right"><div class="seg" id="run-seg">
+            <button type="button" data-r="" aria-pressed="true">Tất cả</button><button type="button" data-r="bad" aria-pressed="false">Lỗi</button><button type="button" data-r="skip" aria-pressed="false">Bỏ qua</button></div>
+            <button class="btn" type="button" id="x-runs"><svg class="i"><use href="#i-down"/></svg>Xuất Excel</button></div></div>
+          <div class="tbox" style="margin-top:14px"><table><thead><tr><th>Lúc</th><th>Tác vụ</th><th>Kết quả</th><th>Chi tiết</th></tr></thead><tbody id="runs"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- BÁO CÁO -->
+      <section id="v-bao-cao" class="grid" hidden>
+        <div class="card">
+          <div class="card-h"><h2>Tuần này so với tuần trước</h2><span class="hint" id="wk-range"></span><div class="right">
+            <button class="btn" type="button" id="x-week"><svg class="i"><use href="#i-down"/></svg>Xuất báo cáo tuần</button></div></div>
+          <div class="tbox" style="margin-top:14px"><table><thead><tr><th>Kênh</th><th class="num">Bài</th><th class="num">Lượt xem</th><th class="num">So với tuần trước</th><th class="num">Tương tác</th><th class="num">TB xem/bài</th><th class="num">Bài lỗi</th></tr></thead><tbody id="wk"></tbody></table></div>
+        </div>
+        <div class="grid g-1-1">
+          <div class="card"><div class="card-h"><h2>Tin đăng timviecso.vn theo tuần</h2></div><div class="tbox" style="margin-top:14px"><table><thead><tr><th>Loại hình</th><th class="num">Tuần này</th><th class="num">Tuần trước</th><th class="num">Thay đổi</th></tr></thead><tbody id="wk-jobs"></tbody></table></div></div>
+          <div class="card"><div class="card-h"><h2>Giờ đăng hiệu quả</h2><span class="hint">lượt xem trung bình theo khung giờ, 30 ngày</span></div><div class="card-b bars" id="by-hour"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>10 bài nhiều lượt xem nhất</h2><span class="hint">30 ngày</span></div>
+          <div class="tbox" style="margin-top:14px"><table><thead><tr><th>#</th><th>Bài đăng</th><th>Ngày</th><th class="num">Lượt xem</th><th class="num">Tương tác</th><th class="num">Tỉ lệ tương tác</th><th></th></tr></thead><tbody id="top10"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- TẠM DỪNG, CHẶN -->
+      <section id="v-dieu-khien" class="grid" hidden>
+        <div class="card">
+          <div class="card-h"><h2>Tạm dừng đăng tự động</h2><span class="hint">Tác vụ đọc công tắc trước mỗi lượt đăng</span></div>
+          <div class="card-b"><div id="pauses"></div>
+            <div class="alert info" style="margin-top:12px"><svg class="i" style="color:var(--brand)"><use href="#i-clock"/></svg><div>Bài đã hẹn giờ sẵn trên Buffer không bị hủy. Tạm dừng có hiệu lực từ lượt chạy kế tiếp.</div></div></div>
+        </div>
+        <div class="grid g-1-1">
+          <div class="card"><div class="card-h"><h2>Nhà tuyển dụng bị chặn</h2><span class="hint" id="n-be"></span></div><div class="card-b">
+            <form class="addrow" id="add-emp"><input id="in-emp" placeholder="Tên công ty, ví dụ: Công ty TNHH ABC" aria-label="Tên nhà tuyển dụng" maxlength="120"><button class="btn primary" type="submit">Thêm</button></form>
+            <div class="chips" id="chips-emp"></div></div></div>
+          <div class="card"><div class="card-h"><h2>Từ khóa bị chặn</h2><span class="hint" id="n-bk"></span></div><div class="card-b">
+            <form class="addrow" id="add-kw"><input id="in-kw" placeholder="Ví dụ: bảo hiểm, đa cấp, telesales" aria-label="Từ khóa" maxlength="120"><button class="btn primary" type="submit">Thêm</button></form>
+            <div class="chips" id="chips-kw"></div></div></div>
+        </div>
+        <div class="alert info"><svg class="i" style="color:var(--brand)"><use href="#i-ban"/></svg><div>Tin của nhà tuyển dụng hoặc có từ khóa trong danh sách sẽ không được đăng lên timviecso.vn nữa (so khớp không phân biệt hoa thường, có dấu hay không dấu). Tin đã có trên trang thì xem ở mục Tin tuyển dụng, lọc "Bị chặn" rồi gỡ.</div></div>
       </section>
 
       <!-- NHẬT KÝ -->
@@ -406,7 +516,8 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
 const TZ = "Asia/Ho_Chi_Minh";
 const SVC = {facebook: "Facebook", tiktok: "TikTok", youtube: "YouTube", website: "timviecso.vn"};
 const PLAT_ICON = {facebook: "<b>f</b>", tiktok: '<svg class="i"><use href="#i-note"/></svg>', youtube: '<svg class="i"><use href="#i-play"/></svg>', website: '<svg class="i"><use href="#i-globe"/></svg>'};
-const TITLES = {"tong-quan": "Tổng quan", "lich-chay": "Lịch chạy", "bai-dang": "Bài đã đăng", "tin-timviecso": "Tin tuyển dụng", "nhat-ky": "Nhật ký gỡ tin"};
+const TITLES = {"tong-quan": "Tổng quan", "lich-chay": "Lịch chạy", "bai-dang": "Bài đã đăng", "tin-timviecso": "Tin tuyển dụng",
+  "nhat-ky-chay": "Cảnh báo, lượt chạy", "bao-cao": "Báo cáo", "dieu-khien": "Tạm dừng, chặn", "nhat-ky": "Nhật ký gỡ tin"};
 const VIEWS = Object.keys(TITLES);
 const PAGE = 25;
 const $ = (s) => document.querySelector(s);
@@ -476,6 +587,7 @@ function renderAll() {
   $("#n-posts").textContent = s.posts.length || "";
   $("#n-jobs").textContent = s.jobs.length || "";
   renderOverview(); renderSchedule(); renderPosts(); renderJobs(); renderLog();
+  renderAlerts(); renderRuns(); renderReport(); renderControl();
 }
 
 /* ---------- biểu đồ ---------- */
@@ -629,10 +741,33 @@ $("#pq").addEventListener("input", () => snap && renderPosts());
 /* ---------- tin tuyển dụng ---------- */
 const approved = (j) => !!snap.approvals[j.id];
 const daysLeft = (d) => d ? Math.round((Date.parse(d) - Date.parse(vnNow().slice(0, 10))) / 864e5) : null;
+const norm = (t) => String(t || "").toLowerCase().replace(/đ/g, "d").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
+let dupKeys = new Set();
+function computeDups() {
+  const c = {};
+  for (const j of snap.jobs) { const k = norm(j.title) + "|" + norm(j.employer); c[k] = (c[k] || 0) + 1; }
+  dupKeys = new Set(Object.keys(c).filter((k) => c[k] > 1));
+}
+const isDup = (j) => dupKeys.has(norm(j.title) + "|" + norm(j.employer));
+function blockReason(j) {
+  const b = (snap.control || {}).block || {}, emp = norm(j.employer), body = norm(`${j.title} ${j.employer}`);
+  for (const e of b.employers || []) { const n = norm(e); if (n && (n === emp || (n.length >= 6 && emp.includes(n)))) return "Nhà tuyển dụng bị chặn"; }
+  for (const k of b.keywords || []) { const n = norm(k); if (n && new RegExp(`(^|[^a-z0-9])${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z0-9]|$)`).test(body)) return `Từ khóa "${k}"`; }
+  return "";
+}
 function filteredJobs() {
-  const q = $("#q").value.trim().toLowerCase(), t = $("#f-type").value, l = $("#f-loc").value;
-  return snap.jobs.filter((j) => (!q || `${j.title} ${j.employer}`.toLowerCase().includes(q)) && (!t || j.workType === t) && (!l || j.location === l)
-    && (!stateFilter || (stateFilter === "ok" ? approved(j) : stateFilter === "new" ? !approved(j) : (daysLeft(j.deadline) ?? 99) <= 3)));
+  const q = norm($("#q").value), t = $("#f-type").value, l = $("#f-loc").value, src = $("#f-src").value, today = vnNow().slice(0, 10);
+  const test = {"": () => true, ok: approved, new: (j) => !approved(j), soon: (j) => { const d = daysLeft(j.deadline); return d !== null && d >= 0 && d <= 3; },
+    late: (j) => (daysLeft(j.deadline) ?? 0) < 0, dup: isDup, blk: (j) => !!blockReason(j), today: (j) => (j.created_vn || "").startsWith(today)}[stateFilter];
+  const list = snap.jobs.filter((j) => (!q || norm(`${j.title} ${j.employer}`).includes(q)) && (!t || j.workType === t) && (!l || j.location === l)
+    && (!src || host(j.source) === src) && test(j));
+  const sort = $("#f-sort").value;
+  if (sort === "old") list.sort((a, b) => (a.created_vn || "").localeCompare(b.created_vn || ""));
+  else if (sort === "dl") list.sort((a, b) => (a.deadline || "9999").localeCompare(b.deadline || "9999"));
+  else if (sort === "co") list.sort((a, b) => norm(a.employer).localeCompare(norm(b.employer)));
+  else if (stateFilter === "dup") list.sort((a, b) => (norm(a.title) + norm(a.employer)).localeCompare(norm(b.title) + norm(b.employer)));
+  return list;
 }
 function fillSelect(sel, values) {
   const el = $(sel), cur = el.value; el.length = 1;
@@ -644,6 +779,8 @@ function initials(n) { return esc(String(n || "?").replace(/^(công ty|cty|ngân
 function renderJobs() {
   fillSelect("#f-type", snap.jobs.map((j) => j.workType));
   fillSelect("#f-loc", snap.jobs.map((j) => j.location));
+  fillSelect("#f-src", snap.jobs.map((j) => host(j.source)));
+  computeDups();
   const list = filteredJobs(), pages = Math.max(1, Math.ceil(list.length / PAGE));
   page = Math.min(page, pages - 1);
   const rows = list.slice(page * PAGE, page * PAGE + PAGE);
@@ -654,7 +791,8 @@ function renderJobs() {
     return `<tr class="${selected.has(j.id) ? "sel" : ""}">
       <td><input type="checkbox" data-id="${esc(j.id)}" ${selected.has(j.id) ? "checked" : ""} aria-label="Chọn tin"></td>
       <td><div class="job"><span class="av">${safeUrl(j.logo) ? `<img src="${safeUrl(j.logo)}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('${initials(j.employer).replace(/'/g, "")}'))">` : initials(j.employer)}</span>
-        <div><div class="t">${esc(j.title)}</div><div class="s">${esc(j.employer)} · ${esc(j.salary)}</div></div></div></td>
+        <div><div class="t">${esc(j.title)}</div><div class="s">${esc(j.employer)} · ${esc(j.salary)}</div>
+        ${isDup(j) || blockReason(j) ? `<div style="display:flex;gap:6px;margin-top:4px">${isDup(j) ? '<span class="badge warn">Trùng</span>' : ""}${blockReason(j) ? `<span class="badge bad">${esc(blockReason(j))}</span>` : ""}</div>` : ""}</div></div></td>
       <td>${esc(j.location)}</td><td>${typeTag(j.workType)}</td>
       <td><div class="mono">${ddmm(j.deadline)}</div><div class="dl-l ${cls}">${dtext}</div></td>
       <td class="mono">${hhmm(j.created_vn)} · ${ddmm(j.created_vn)}</td>
@@ -667,7 +805,7 @@ function renderJobs() {
   renderBulk();
 }
 function renderBulk() { $("#bulk").hidden = !selected.size; $("#bulk-n").textContent = `Đã chọn ${selected.size} tin`; disarm(); }
-["#q", "#f-type", "#f-loc"].forEach((s) => $(s).addEventListener("input", () => { page = 0; if (snap) renderJobs(); }));
+["#q", "#f-type", "#f-loc", "#f-src", "#f-sort"].forEach((s) => $(s).addEventListener("input", () => { page = 0; if (snap) renderJobs(); }));
 $("#state-seg").addEventListener("click", (e) => {
   const b = e.target.closest("button"); if (!b) return;
   stateFilter = b.dataset.s; page = 0;
@@ -699,7 +837,13 @@ $("#b-remove").addEventListener("click", async () => {
   if (!b.classList.contains("armed")) { b.classList.add("armed"); b.querySelector("span").textContent = `Xác nhận gỡ ${selected.size} tin`; armTimer = setTimeout(disarm, 6000); return; }
   disarm(); b.disabled = true;
   try {
-    const r = await call("/api/remove", {ids: [...selected], reason});
+    const ids = [...selected];
+    const r = await call("/api/remove", {ids, reason});
+    if ($("#b-block").checked) {
+      const emps = snap.jobs.filter((j) => ids.includes(j.id)).map((j) => j.employer).filter(Boolean);
+      if (emps.length) { const c = await call("/api/block", {add_employers: emps}); snap.control = c.control; toast(`Đã chặn ${new Set(emps).size} nhà tuyển dụng.`); }
+      $("#b-block").checked = false;
+    }
     const done = r.results.filter((x) => x.status === "da_go").length, bad = r.results.filter((x) => x.status === "loi");
     toast(`Đã gỡ ${done} tin khỏi timviecso.vn.` + (bad.length ? ` ${bad.length} tin lỗi: ${bad[0].error}` : ""), bad.length > 0);
     selected.clear(); $("#reason").value = "";
@@ -716,6 +860,205 @@ function renderLog() {
     return `<tr><td><div class="job" style="min-width:220px"><div><div class="t">${esc(r.title || r.id)}</div><div class="s">${esc(r.employer)}</div></div></div></td><td>${esc(r.reason)}</td><td><span class="badge ${c}">${t}</span>${r.error ? `<div class="dl-l late">${esc(r.error)}</div>` : ""}</td><td class="mono">${hhmm(r.time_vn)} · ${ddmm(r.time_vn)}</td></tr>`; }).join("")
     : `<tr><td colspan="4"><div class="empty">${icon("inbox")}<div>Chưa có tin nào được gỡ từ website.</div></div></td></tr>`;
 }
+
+/* ---------- xuất Excel (CSV có BOM để Excel đọc đúng tiếng Việt) ---------- */
+function downloadCsv(name, header, rows) {
+  const cell = (v) => { const t = String(v ?? ""); return /[",\n;]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+  const body = [header, ...rows].map((r) => r.map(cell).join(",")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["﻿" + body], {type: "text/csv;charset=utf-8"}));
+  a.download = `${name}-${vnNow().slice(0, 10)}.csv`;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+$("#x-posts").addEventListener("click", () => downloadCsv("bai-dang", ["Kênh", "Thời gian", "Tiêu đề", "Trạng thái", "Lượt xem", "Tương tác", "Link", "Lỗi"],
+  snap.posts.map((p) => [SVC[p.service] || p.service, p.time_vn, p.title, p.status, p.views, p.engagement, p.link, p.error || ""])));
+$("#x-jobs").addEventListener("click", () => downloadCsv("tin-tuyen-dung", ["Mã tin", "Tiêu đề", "Công ty", "Khu vực", "Loại hình", "Lương", "Hạn nộp", "Đăng lúc", "Đã duyệt", "Trùng", "Bị chặn", "Link timviecso.vn", "Nguồn"],
+  filteredJobs().map((j) => [j.id, j.title, j.employer, j.location, j.workType, j.salary, j.deadline, j.created_vn, approved(j) ? "Có" : "", isDup(j) ? "Có" : "", blockReason(j), j.url, j.source])));
+$("#x-runs").addEventListener("click", () => downloadCsv("nhat-ky-chay", ["Lúc", "Tác vụ", "Kết quả", "Tóm tắt"],
+  [...snap.runs].reverse().map((r) => [r.time_vn, taskName(r.task), r.skipped ? "Bỏ qua" : r.ok ? "Thành công" : "Lỗi", r.summary])));
+
+/* ---------- cảnh báo, lượt chạy ---------- */
+const taskName = (k) => (snap.task_names || {})[k] || k;
+const openAlerts = () => (snap.alerts || []).filter((a) => !a.ack).reverse();
+function alertRow(a, withBtn) {
+  const c = a.level === "warn" ? "orange" : "red";
+  return `<div class="al"><span class="ic ${c}">${icon("alert")}</span><div style="min-width:0"><div class="t">${esc(a.title)}</div><div class="d">${esc(a.detail || "")}</div><div class="d mono" style="margin-top:2px">${hhmm(a.time_vn)} · ${ddmm(a.time_vn)}</div></div>
+    ${withBtn ? `<div class="r"><button class="btn" type="button" data-ack="${esc(a.id)}">Đã xem</button></div>` : ""}</div>`;
+}
+function renderAlerts() {
+  const open = openAlerts();
+  const n = $("#n-alerts"); n.textContent = open.length || ""; n.classList.toggle("hot", open.length > 0);
+  $("#al-hint").textContent = open.length ? `${open.length} cảnh báo chưa xem` : "";
+  $("#al-ack-all").hidden = !open.length;
+  $("#alerts").innerHTML = open.length ? open.map((a) => alertRow(a, true)).join("") : `<div class="empty" style="padding:24px">${icon("check")}<div>Không có cảnh báo nào. Mọi thứ đang chạy bình thường.</div></div>`;
+  const ov = $("#ov-alerts");
+  ov.hidden = !open.length;
+  ov.innerHTML = open.length ? `<div class="alert bad">${icon("alert")}<div style="flex:1"><b>${open.length} cảnh báo cần xem.</b> ${esc(open[0].title)}${open.length > 1 ? ` và ${open.length - 1} cảnh báo khác` : ""}.</div><a class="btn" href="#nhat-ky-chay">Xem</a></div>` : "";
+  $("#tg-note").innerHTML = "Muốn nhận cảnh báo qua điện thoại: tạo bot Telegram rồi nhắn Claude để nối vào. Khi đó mỗi cảnh báo mới sẽ được gửi ngay qua Telegram.";
+}
+$("#alerts").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-ack]"); if (!b) return;
+  b.disabled = true;
+  try { await call("/api/alerts/ack", {id: b.dataset.ack}); snap.alerts.find((a) => a.id === b.dataset.ack).ack = vnNow(); renderAlerts(); }
+  catch (err) { toast(err.message, true); b.disabled = false; }
+});
+$("#al-ack-all").addEventListener("click", async () => {
+  try { await call("/api/alerts/ack", {id: "all"}); for (const a of snap.alerts) a.ack = a.ack || vnNow(); renderAlerts(); toast("Đã đánh dấu đã xem."); }
+  catch (err) { toast(err.message, true); }
+});
+$("#wd-run").addEventListener("click", async () => {
+  const b = $("#wd-run"); b.disabled = true;
+  try { const r = await call("/api/watchdog", {}); toast(r.new_alerts.length ? `Có ${r.new_alerts.length} cảnh báo mới.` : "Đã kiểm tra, không có vấn đề mới.", r.new_alerts.length > 0); await load(false); }
+  catch (err) { toast(err.message, true); } finally { b.disabled = false; }
+});
+let runFilter = "";
+$("#run-seg").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  runFilter = b.dataset.r;
+  document.querySelectorAll("#run-seg button").forEach((c) => c.setAttribute("aria-pressed", c === b));
+  renderRuns();
+});
+function runBadge(r) { return r.skipped ? '<span class="badge idle">Bỏ qua</span>' : r.ok ? '<span class="badge ok">Thành công</span>' : '<span class="badge bad">Lỗi</span>'; }
+function renderRuns() {
+  const runs = [...(snap.runs || [])].reverse().filter((r) => !runFilter || (runFilter === "bad" ? !r.ok && !r.skipped : r.skipped));
+  $("#runs").innerHTML = runs.length ? runs.map((r) => `<tr><td class="mono">${hhmm(r.time_vn)} · ${ddmm(r.time_vn)}</td><td style="font-weight:600">${esc(taskName(r.task))}</td><td>${runBadge(r)}</td><td style="color:var(--muted);max-width:520px">${esc(r.summary)}</td></tr>`).join("")
+    : `<tr><td colspan="4"><div class="empty">${icon("inbox")}<div>${(snap.runs || []).length ? "Không có lượt nào khớp." : "Chưa có lượt chạy nào báo về. Các tác vụ sẽ bắt đầu báo từ lượt chạy kế tiếp."}</div></div></td></tr>`;
+  // lượt hôm nay theo lịch
+  const today = vnNow().slice(0, 10), nowMin = toMinJs(vnNow().slice(11, 16));
+  const reported = new Set((snap.runs || []).map((r) => r.task));
+  $("#slots").innerHTML = snap.schedule.filter((t) => t.key && t.days === "Hằng ngày").map((t) => {
+    const pills = t.times.map((time, i) => {
+      const at = toMinJs(time), nextAt = i + 1 < t.times.length ? toMinJs(t.times[i + 1]) - 10 : 1440;
+      const from = `${today} ${hm(Math.max(0, at - 10))}`, to = `${today} ${hm(Math.min(1439, nextAt))}`;
+      const run = (snap.runs || []).find((r) => r.task === t.key && r.time_vn >= from && r.time_vn <= to);
+      let c = "", tip = "Chưa đến giờ";
+      if (run) { c = run.skipped ? "" : run.ok ? "ok" : "bad"; tip = run.summary; }
+      else if (nowMin >= at + t.grace) { c = reported.has(t.key) ? "warn" : ""; tip = reported.has(t.key) ? "Quá giờ, chưa báo kết quả" : "Tác vụ chưa báo về lần nào"; }
+      else if (nowMin >= at) tip = "Đang chạy hoặc chờ báo";
+      return `<span class="pill ${c}" title="${esc(tip)}">${esc(time)}${run ? (run.skipped ? " · dừng" : run.ok ? " ✓" : " ✕") : ""}</span>`;
+    }).join("");
+    return `<div class="slot"><div><div style="font-weight:600;font-size:13.5px">${esc(t.name)}</div><div class="tm">${pills}</div></div></div>`;
+  }).join("");
+}
+const toMinJs = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+const hm = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+
+/* ---------- báo cáo ---------- */
+function weekStats(fromDay, toDay) {
+  const by = {};
+  for (const p of snap.posts) {
+    const d = (p.time_vn || "").slice(0, 10); if (d < fromDay || d > toDay) continue;
+    const s = by[p.service] ||= {posts: 0, views: 0, engagement: 0, errors: 0};
+    if (p.status === "sent") { s.posts++; s.views += p.views; s.engagement += p.engagement; } else if (p.status === "error") s.errors++;
+  }
+  return by;
+}
+const dayAgo = (n) => new Date(Date.now() - n * 864e5).toLocaleString("sv-SE", {timeZone: TZ}).slice(0, 10);
+function delta(cur, prev) {
+  if (!prev && !cur) return '<span class="delta flat">0%</span>';
+  if (!prev) return '<span class="delta up">mới</span>';
+  const pct = Math.round((cur - prev) / prev * 100);
+  return `<span class="delta ${pct > 0 ? "up" : pct < 0 ? "down" : "flat"}">${pct > 0 ? "▲ " : pct < 0 ? "▼ " : ""}${Math.abs(pct)}%</span>`;
+}
+let weekRows = [];
+function renderReport() {
+  const cur = weekStats(dayAgo(6), dayAgo(0)), prev = weekStats(dayAgo(13), dayAgo(7));
+  $("#wk-range").textContent = `${ddmm(dayAgo(6))} – ${ddmm(dayAgo(0))} so với ${ddmm(dayAgo(13))} – ${ddmm(dayAgo(7))}`;
+  const keys = ["facebook", "tiktok", "youtube"].filter((k) => cur[k] || prev[k]);
+  const z = {posts: 0, views: 0, engagement: 0, errors: 0};
+  weekRows = keys.map((k) => ({k, c: cur[k] || z, p: prev[k] || z}));
+  const tot = weekRows.reduce((a, r) => ({c: {posts: a.c.posts + r.c.posts, views: a.c.views + r.c.views, engagement: a.c.engagement + r.c.engagement, errors: a.c.errors + r.c.errors},
+    p: {posts: a.p.posts + r.p.posts, views: a.p.views + r.p.views, engagement: a.p.engagement + r.p.engagement, errors: a.p.errors + r.p.errors}}), {c: {...z}, p: {...z}});
+  const row = (lb, c, p, bold) => `<tr${bold ? ' style="font-weight:700"' : ""}><td>${lb}</td><td class="num">${fmt(c.posts)}</td><td class="num"><b>${fmt(c.views)}</b></td><td class="num">${delta(c.views, p.views)}</td><td class="num">${fmt(c.engagement)} ${delta(c.engagement, p.engagement)}</td><td class="num">${fmt(c.posts ? Math.round(c.views / c.posts) : 0)}</td><td class="num">${c.errors ? `<span class="down">${c.errors}</span>` : 0}</td></tr>`;
+  $("#wk").innerHTML = weekRows.length ? weekRows.map((r) => row(`<span style="display:flex;gap:10px;align-items:center">${plat(r.k)}${SVC[r.k]}</span>`, r.c, r.p)).join("") + row("Tổng", tot.c, tot.p, true)
+    : `<tr><td colspan="7"><div class="empty">Chưa có bài trong 14 ngày.</div></td></tr>`;
+  // tin theo tuần
+  const jc = (from, to) => snap.jobs.reduce((o, j) => { const d = (j.created_vn || "").slice(0, 10); if (d >= from && d <= to) o[j.workType || "Khác"] = (o[j.workType || "Khác"] || 0) + 1; return o; }, {});
+  const jcur = jc(dayAgo(6), dayAgo(0)), jprev = jc(dayAgo(13), dayAgo(7));
+  const types = [...new Set([...Object.keys(jcur), ...Object.keys(jprev)])].sort();
+  const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+  $("#wk-jobs").innerHTML = types.map((t) => `<tr><td>${typeTag(t)}</td><td class="num"><b>${fmt(jcur[t] || 0)}</b></td><td class="num">${fmt(jprev[t] || 0)}</td><td class="num">${delta(jcur[t] || 0, jprev[t] || 0)}</td></tr>`).join("")
+    + `<tr style="font-weight:700"><td>Tổng</td><td class="num">${fmt(sum(jcur))}</td><td class="num">${fmt(sum(jprev))}</td><td class="num">${delta(sum(jcur), sum(jprev))}</td></tr>`;
+  // giờ đăng
+  const slots = {};
+  for (const p of snap.posts) if (p.status === "sent" && p.time_vn) { const h = +p.time_vn.slice(11, 13), k = `${String(h).padStart(2, "0")}:00 – ${String(h + 1).padStart(2, "0")}:00`; (slots[k] ||= []).push(p.views); }
+  const hrs = Object.entries(slots).map(([k, v]) => [k, Math.round(v.reduce((a, b) => a + b, 0) / v.length), v.length]).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const mH = Math.max(1, ...hrs.map((h) => h[1]));
+  $("#by-hour").innerHTML = hrs.length ? hrs.map(([k, v, n]) => `<div class="bar"><div class="t"><span>${k} <span style="color:var(--muted)">· ${n} bài</span></span><b>${fmt(v)}</b></div><div class="tr"><div class="fl" style="width:${v / mH * 100}%"></div></div></div>`).join("") : `<div class="empty">Chưa có dữ liệu.</div>`;
+  // top 10
+  const top = snap.posts.filter((p) => p.status === "sent").sort((a, b) => b.views - a.views).slice(0, 10);
+  $("#top10").innerHTML = top.map((p, i) => `<tr><td class="mono">#${i + 1}</td><td><div class="post">${plat(p.service)}<div class="t">${esc(p.title)}</div></div></td><td class="mono">${ddmm(p.time_vn)}</td><td class="num"><b>${fmt(p.views)}</b></td><td class="num">${fmt(p.engagement)}</td><td class="num">${p.views ? (p.engagement / p.views * 100).toFixed(1) + "%" : "–"}</td>
+    <td><div class="links">${safeUrl(p.link) ? `<a class="icon-btn" href="${safeUrl(p.link)}" target="_blank" rel="noopener" title="Mở bài" aria-label="Mở bài">${icon("ext")}</a>` : ""}</div></td></tr>`).join("") || `<tr><td colspan="7"><div class="empty">Chưa có bài.</div></td></tr>`;
+}
+$("#x-week").addEventListener("click", () => {
+  const rows = weekRows.map((r) => [SVC[r.k], r.c.posts, r.c.views, r.p.views, r.c.engagement, r.p.engagement, r.c.errors]);
+  const top = snap.posts.filter((p) => p.status === "sent").sort((a, b) => b.views - a.views).slice(0, 10);
+  downloadCsv("bao-cao-tuan", ["Kênh", "Bài tuần này", "Lượt xem tuần này", "Lượt xem tuần trước", "Tương tác tuần này", "Tương tác tuần trước", "Bài lỗi"],
+    [...rows, [], ["Top 10 bài 30 ngày", "Ngày", "Lượt xem", "Tương tác", "Link"], ...top.map((p) => [`${SVC[p.service]}: ${p.title}`, p.time_vn, p.views, p.engagement, p.link])]);
+});
+
+/* ---------- tạm dừng, chặn ---------- */
+const PAUSES = [["all", "Cả hệ thống", "Dừng mọi lượt đăng: bản tin video, tin timviecso.vn"], ["facebook", "Facebook", "Bản tin video trên Fanpage"],
+  ["tiktok", "TikTok", "Bản tin video @timviecso.vn"], ["youtube", "YouTube", "Bản tin video Shorts"], ["timviecso", "timviecso.vn", "Tin tuyển dụng và video trên trang chủ"]];
+function pauseState(k) {
+  const p = ((snap.control || {}).pause || {})[k] || {};
+  if (!p.on) return null;
+  if (p.until && Date.parse(p.until) <= Date.now()) return null;
+  return p;
+}
+function renderControl() {
+  const ctl = snap.control || {pause: {}, block: {employers: [], keywords: []}};
+  const nPaused = PAUSES.filter(([k]) => pauseState(k)).length;
+  const np = $("#n-paused"); np.textContent = nPaused ? "Dừng" : ""; np.classList.toggle("hot", nPaused > 0);
+  const all = pauseState("all");
+  $("#pauses").innerHTML = PAUSES.map(([k, nm, sub]) => {
+    const p = pauseState(k), until = p && p.until ? new Date(p.until).toLocaleString("vi-VN", {timeZone: TZ, hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit"}) : "";
+    const st = p ? `Đang tạm dừng${until ? ` đến ${until}` : ", đến khi bật lại"}` : k !== "all" && all ? "Đang dừng theo công tắc cả hệ thống" : "Đang chạy bình thường";
+    return `<div class="ctl ${k === "all" ? "master" : ""}">${k === "all" ? `<span class="ic red" style="width:32px;height:32px;border-radius:9px;display:grid;place-items:center">${icon("pause")}</span>` : plat(k === "timviecso" ? "website" : k)}
+      <div><div class="nm">${nm}</div><div class="st ${p ? "on" : ""}">${st}</div><div class="st" style="font-size:12px">${sub}</div></div>
+      <div class="r">${p ? "" : `<select class="sel" data-dur="${k}" aria-label="Thời gian dừng"><option value="0">Đến khi bật lại</option><option value="24">24 giờ</option><option value="72">3 ngày</option><option value="168">7 ngày</option></select>`}
+      <button class="sw" type="button" role="switch" aria-checked="${!!p}" data-pause="${k}" aria-label="Tạm dừng ${nm}"></button></div></div>`;
+  }).join("");
+  chips("#chips-emp", ctl.block.employers, "employers"); chips("#chips-kw", ctl.block.keywords, "keywords");
+  $("#n-be").textContent = ctl.block.employers.length ? `${ctl.block.employers.length} nhà tuyển dụng` : "";
+  $("#n-bk").textContent = ctl.block.keywords.length ? `${ctl.block.keywords.length} từ khóa` : "";
+}
+function chips(sel, list, kind) {
+  $(sel).innerHTML = list.length ? list.map((x, i) => `<span class="chip">${esc(x)}<button type="button" data-kind="${kind}" data-i="${i}" aria-label="Bỏ ${esc(x)}">×</button></span>`).join("")
+    : `<span style="color:var(--muted);font-size:13px">Chưa có mục nào.</span>`;
+}
+$("#pauses").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-pause]"); if (!b) return;
+  const k = b.dataset.pause, on = b.getAttribute("aria-checked") !== "true";
+  const durSel = document.querySelector(`[data-dur="${k}"]`), hours = durSel ? +durSel.value : 0;
+  b.disabled = true;
+  try {
+    const r = await call("/api/pause", {key: k, paused: on, hours});
+    snap.control = r.control; renderControl();
+    const nm = PAUSES.find((x) => x[0] === k)[1];
+    toast(on ? `Đã tạm dừng ${nm}.` : `Đã bật lại ${nm}.`);
+  } catch (err) { toast(err.message, true); b.disabled = false; }
+});
+async function saveBlock(kind, list) {
+  const r = await call("/api/block", {[kind]: list});
+  snap.control = r.control; renderControl(); renderJobs();
+}
+for (const [form, input, kind] of [["#add-emp", "#in-emp", "employers"], ["#add-kw", "#in-kw", "keywords"]]) {
+  $(form).addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const items = $(input).value.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
+    if (!items.length) return;
+    try { await saveBlock(kind, [...snap.control.block[kind], ...items]); $(input).value = ""; toast(`Đã thêm ${items.length} mục vào danh sách chặn.`); }
+    catch (err) { toast(err.message, true); }
+  });
+}
+document.querySelectorAll("#chips-emp,#chips-kw").forEach((el) => el.addEventListener("click", async (e) => {
+  const b = e.target.closest("button[data-kind]"); if (!b) return;
+  const list = [...snap.control.block[b.dataset.kind]]; const [gone] = list.splice(+b.dataset.i, 1);
+  try { await saveBlock(b.dataset.kind, list); toast(`Đã bỏ chặn "${gone}".`); } catch (err) { toast(err.message, true); }
+}));
+
 
 route();
 load(false);

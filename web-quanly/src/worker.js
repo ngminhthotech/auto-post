@@ -10,21 +10,30 @@ const ENGAGE = ["reactions", "comments", "shares", "clicks"];
 const ID_RE = /^[0-9a-f]{24}$/;
 const SESSION_DAYS = 14;
 const PUBLIC_FILES = new Set(["/logo.png", "/logo-d24.png", "/favicon.png"]);
+// Công tắc tạm dừng: all = cả hệ thống; còn lại theo kênh.
+const PAUSE_KEYS = ["all", "facebook", "tiktok", "youtube", "timviecso"];
+const TASK_NAMES = {"bantin": "Bản tin video 7:00", "website-video": "Video bản tin lên timviecso.vn", "timviecso-dang": "Đăng tin timviecso.vn",
+  "go-het-han": "Gỡ tin hết hạn", "bao-cao-tuan": "Báo cáo hiệu quả tuần", "bang-dieu-khien": "Cập nhật bảng điều khiển"};
 
 // Lịch các tác vụ Claude (giờ Việt Nam). Website không đổi được lịch này; đổi trên bảng điều khiển Claude.
+// key: tên tác vụ khi báo kết quả về website (autopost.control); grace: số phút chờ báo trước khi coi là lỡ lượt.
 const SCHEDULE = [
-  {name: "Bản tin video 7:00 (FB, TikTok, YouTube, timviecso.vn)", times: ["5:17"], days: "Hằng ngày", note: "Dựng video từ 5:17, đăng 7:00"},
-  {name: "Đăng timviecso.vn đợt 7:00 (5 tin)", times: ["6:52"], days: "Hằng ngày"},
-  {name: "Đăng timviecso.vn (2 giờ 1 tin)", times: ["9:07", "11:07", "13:07", "15:07", "17:07", "19:07", "21:07"], days: "Hằng ngày"},
-  {name: "Gỡ tin hết hạn timviecso.vn", times: ["0:23"], days: "Hằng ngày"},
+  {key: "bantin", grace: 210, name: "Bản tin video 7:00 (FB, TikTok, YouTube, timviecso.vn)", times: ["5:17"], days: "Hằng ngày", note: "Dựng video từ 5:17, đăng 7:00"},
+  {key: "timviecso-dang", grace: 75, name: "Đăng timviecso.vn đợt 7:00 (5 tin)", times: ["6:52"], days: "Hằng ngày"},
+  {key: "timviecso-dang", grace: 75, name: "Đăng timviecso.vn (2 giờ 1 tin)", times: ["9:07", "11:07", "13:07", "15:07", "17:07", "19:07", "21:07"], days: "Hằng ngày"},
+  {key: "go-het-han", grace: 75, name: "Gỡ tin hết hạn timviecso.vn", times: ["0:23"], days: "Hằng ngày"},
   {name: "Báo cáo hiệu quả tuần", times: ["8:41"], days: "Thứ Hai"},
   {name: "Bảng điều khiển Claude (cập nhật số liệu)", times: ["12:47", "21:47"], days: "Hằng ngày"},
 ];
 
 export default {
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(watchdog(env));
+  },
   async fetch(req, env) {
     const url = new URL(req.url);
     try {
+      if (url.pathname.startsWith("/api/agent/")) return await agentApi(req, env, url);
       if (url.pathname === "/login") return login(req, env);
       if (url.pathname === "/logout") return logout(env);
       if (PUBLIC_FILES.has(url.pathname)) return env.ASSETS.fetch(req);
@@ -89,10 +98,15 @@ async function hmac(secret, msg) {
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(msg));
   return btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
+// Chữ ký phiên gồm tên đăng nhập, mật khẩu và "muối" trong KV: đổi muối là đăng xuất mọi thiết bị.
+async function sessionSig(env, exp) {
+  const salt = await env.KV.get("session_salt") || "";
+  return hmac(env.PASSWORD, `aq:${String(env.USERNAME || "admin").toLowerCase()}:${salt}:${exp}`);
+}
 async function checkSession(value, env) {
   const [exp, sig] = value.split(".");
   if (!exp || !sig || Number(exp) < Date.now()) return false;
-  return timingSafeEqual(sig, await hmac(env.PASSWORD, `aq:${String(env.USERNAME || "admin").toLowerCase()}:${exp}`));
+  return timingSafeEqual(sig, await sessionSig(env, exp));
 }
 function timingSafeEqual(a, b) {
   if (a.length !== b.length) return false;
@@ -119,7 +133,7 @@ async function login(req, env) {
       const okPass = timingSafeEqual(await hmac("cmp", given), await hmac("cmp", env.PASSWORD));
       if (okUser && okPass) {
         const exp = Date.now() + SESSION_DAYS * 864e5;
-        const value = `${exp}.${await hmac(env.PASSWORD, `aq:${String(env.USERNAME || "admin").toLowerCase()}:${exp}`)}`;
+        const value = `${exp}.${await sessionSig(env, exp)}`;
         return new Response(null, {status: 302, headers: {
           Location: "/",
           "Set-Cookie": `aq_session=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_DAYS * 86400}`,
@@ -208,12 +222,13 @@ button:focus-visible{outline:3px solid rgba(11,134,232,.45);outline-offset:2px}
       <div class="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
       <input id="pw" name="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
       <button class="eye" type="button" id="eye" aria-label="Hiện mật khẩu"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+
     <button class="go" type="submit">Đăng nhập</button>
     <div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Ghi nhớ đăng nhập 14 ngày trên thiết bị này.</div>
     <div class="foot">© Học viện Design24 · timviecso.vn</div>
   </form>
 </main>
-<script>document.getElementById("eye").onclick=function(){var i=document.getElementById("pw");var s=i.type==="password";i.type=s?"text":"password";this.setAttribute("aria-label",s?"Ẩn mật khẩu":"Hiện mật khẩu");i.focus()}</script>
+<script>var e=document.getElementById("eye");if(e)e.onclick=function(){var i=document.getElementById("pw");var s=i.type==="password";i.type=s?"text":"password";this.setAttribute("aria-label",s?"Ẩn mật khẩu":"Hiện mật khẩu");i.focus()}</script>
 </body></html>`;
 }
 
@@ -253,8 +268,110 @@ async function api(req, env, url, user) {
     await env.KV.delete("cache:data");
     return json({ok: results.every((r) => r.status !== "loi"), results});
   }
+  if (path === "/api/pause" && req.method === "POST") {
+    const {key, paused, hours} = await req.json();
+    if (!PAUSE_KEYS.includes(key)) return json({error: "Sai công tắc"}, 400);
+    const ctl = await control(env);
+    ctl.pause[key] = paused ? {on: true, at: vnNow(), until: hours > 0 ? new Date(Date.now() + hours * 3600e3).toISOString() : null} : {on: false, at: vnNow()};
+    await env.KV.put("control", JSON.stringify(ctl));
+    return json({ok: true, control: ctl});
+  }
+  if (path === "/api/block" && req.method === "POST") {
+    const body = await req.json();
+    const clean = (list) => [...new Set((list || []).map((x) => String(x).trim().replace(/\s+/g, " ").slice(0, 120)).filter(Boolean))].slice(0, 500);
+    const ctl = await control(env);
+    if (body.add_employers) ctl.block.employers = clean([...ctl.block.employers, ...body.add_employers]);
+    if (body.employers) ctl.block.employers = clean(body.employers);
+    if (body.keywords) ctl.block.keywords = clean(body.keywords);
+    await env.KV.put("control", JSON.stringify(ctl));
+    return json({ok: true, control: ctl});
+  }
+  if (path === "/api/alerts/ack" && req.method === "POST") {
+    const {id} = await req.json();
+    const alerts = await kvJson(env, "alerts", []);
+    for (const a of alerts) if (!a.ack && (id === "all" || a.id === id)) a.ack = vnNow();
+    await env.KV.put("alerts", JSON.stringify(alerts));
+    return json({ok: true});
+  }
+  if (path === "/api/watchdog" && req.method === "POST") return json({ok: true, new_alerts: await watchdog(env)});
   return json({error: "Không có đường dẫn này"}, 404);
 }
+
+/* ---------------- tác vụ báo về (autopost.control) ---------------- */
+
+async function agentApi(req, env, url) {
+  const auth = req.headers.get("Authorization") || "";
+  if (!env.AGENT_TOKEN || !timingSafeEqual(await hmac("cmp", auth), await hmac("cmp", `Bearer ${env.AGENT_TOKEN}`))) return json({error: "Sai khóa"}, 401);
+  if (url.pathname === "/api/agent/config" && req.method === "GET") return json(await control(env));
+  if (url.pathname === "/api/agent/run" && req.method === "POST") {
+    const b = await req.json();
+    const task = String(b.task || "").slice(0, 40);
+    if (!/^[a-z0-9-]+$/.test(task)) return json({error: "Sai tên tác vụ"}, 400);
+    const run = {id: crypto.randomUUID().slice(0, 8), task, ok: !!b.ok, skipped: !!b.skipped, time_vn: vnNow(),
+      summary: String(b.summary || "").slice(0, 400), details: String(b.details || "").slice(0, 2000)};
+    const runs = await kvJson(env, "runs", []);
+    runs.push(run);
+    await env.KV.put("runs", JSON.stringify(runs.slice(-400)));
+    if (!run.ok && !run.skipped) await addAlerts(env, [{id: `run:${run.id}`, level: "bad", title: `${TASK_NAMES[task] || task} báo lỗi`, detail: run.summary || run.details}]);
+    return json({ok: true, id: run.id});
+  }
+  return json({error: "Không có đường dẫn này"}, 404);
+}
+
+async function control(env) {
+  const c = await kvJson(env, "control", {});
+  return {pause: c.pause || {}, block: {employers: (c.block || {}).employers || [], keywords: (c.block || {}).keywords || []}};
+}
+
+async function addAlerts(env, items) {
+  if (!items.length) return [];
+  const alerts = await kvJson(env, "alerts", []);
+  const seen = new Set(alerts.map((a) => a.id));
+  const fresh = items.filter((a) => !seen.has(a.id)).map((a) => ({...a, time_vn: vnNow()}));
+  if (!fresh.length) return [];
+  await env.KV.put("alerts", JSON.stringify([...alerts, ...fresh].slice(-200)));
+  await notify(env, fresh);
+  return fresh;
+}
+
+// Gửi cảnh báo qua Telegram nếu đã đặt TELEGRAM_BOT_TOKEN và TELEGRAM_CHAT_ID.
+async function notify(env, alerts) {
+  if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) return;
+  const textMsg = "⚠️ Auto Post cần chú ý\n" + alerts.map((a) => `• ${a.title}${a.detail ? ": " + a.detail : ""}`).join("\n").slice(0, 3500);
+  await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({chat_id: env.TELEGRAM_CHAT_ID, text: textMsg, disable_web_page_preview: true})}).catch(() => {});
+}
+
+// Chạy mỗi 30 phút: tìm lượt chạy bị lỡ (tác vụ không báo về đúng hạn) và bài Buffer lỗi mới.
+async function watchdog(env) {
+  const items = [];
+  const runs = await kvJson(env, "runs", []);
+  const reported = new Set(runs.map((r) => r.task));
+  const now = vnNow(), today = now.slice(0, 10), nowMin = toMin(now.slice(11, 16));
+  for (const t of SCHEDULE) {
+    if (!t.key || t.days !== "Hằng ngày" || !reported.has(t.key)) continue; // tác vụ chưa từng báo về thì chưa theo dõi
+    for (const time of t.times) {
+      const at = toMin(time);
+      if (nowMin < at + t.grace || nowMin > at + t.grace + 180) continue;
+      const from = `${today} ${minToHHMM(Math.max(0, at - 10))}`;
+      if (!runs.some((r) => r.task === t.key && r.time_vn >= from)) {
+        items.push({id: `missed:${t.key}:${today}:${time}`, level: "warn", title: `Lượt ${time} của "${t.name}" chưa báo kết quả`, detail: `Đã quá ${t.grace} phút. Tác vụ có thể chưa chạy hoặc bị dừng giữa chừng.`});
+      }
+    }
+  }
+  if (env.BUFFER_API_KEY) {
+    try {
+      for (const p of await bufferPosts(env, 2)) if (p.status === "error") {
+        items.push({id: `buffer:${p.id}`, level: "bad", title: `Bài ${p.service} lỗi trên Buffer`, detail: `${p.time_vn} · ${p.error || p.title}`});
+      }
+    } catch (e) {
+      if (/401|403|unauthor/i.test(String(e.message))) items.push({id: `buffer-key:${today}`, level: "bad", title: "Khóa API Buffer không dùng được", detail: String(e.message).slice(0, 200)});
+    }
+  }
+  return addAlerts(env, items);
+}
+const toMin = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+const minToHHMM = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
 async function data(env, fresh, user) {
   let base = fresh ? null : await kvJson(env, "cache:data", null);
@@ -275,6 +392,10 @@ async function data(env, fresh, user) {
   return {
     ...base,
     user: {email: user.email, via: user.via},
+    control: await control(env),
+    runs: (await kvJson(env, "runs", [])).slice(-150),
+    alerts: (await kvJson(env, "alerts", [])).slice(-60),
+    task_names: TASK_NAMES,
     approvals: await kvJson(env, "approvals", {}),
     removed: (await kvJson(env, "removed", [])).slice(-100),
     schedule: SCHEDULE,

@@ -10,6 +10,10 @@ directory = "./public"
 binding = "ASSETS"
 run_worker_first = true
 
+# Mỗi 30 phút kiểm tra lượt chạy bị lỡ và bài Buffer lỗi (giờ UTC, gói miễn phí cho phép).
+[triggers]
+crons = ["*/30 * * * *"]
+
 # Kho lưu lượt duyệt và nhật ký gỡ tin. Thay id bằng id của kho tạo ở bước 3 trong README.
 [[kv_namespaces]]
 binding = "KV"
@@ -29,4 +33,7 @@ CLAUDE_PANEL = "https://claude.ai/artifact/8X8Q9SMXaf8TnAnhdmLEEW"
 # Bí mật (đặt bằng `npx wrangler secret put <TÊN>` hoặc trong Cloudflare, không ghi vào đây):
 #   BUFFER_API_KEY   khóa API Buffer
 #   TIMVIECSO_TOKEN  chỉ khi API timviecso.vn đòi khóa
-#   PASSWORD         mật khẩu dự phòng, chỉ dùng khi chưa bật Cloudflare Access
+#   USERNAME         tên đăng nhập (mặc định admin)
+#   PASSWORD         mật khẩu, chỉ dùng khi chưa bật Cloudflare Access
+#   AGENT_TOKEN      khóa để tác vụ Claude báo kết quả và đọc công tắc (autopost.control)
+#   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID   (tùy chọn) gửi cảnh báo qua Telegram

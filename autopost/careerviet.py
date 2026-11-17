@@ -38,7 +38,7 @@ from zoneinfo import ZoneInfo
 
 import requests
 
-from autopost import timviecso
+from autopost import control, timviecso
 
 SITE = "https://careerviet.vn"
 DETAIL = "https://internal-api.careerviet.vn/api/v1/js/jsk/jobs/detail/public"
@@ -273,6 +273,10 @@ def scan(max_posts, dry_run=False, max_checks=150, quota=DAILY_QUOTA):
                 job, reason = to_job(d, link, loc)
             except (requests.RequestException, ValueError) as exc:
                 job, reason = None, f"lỗi đọc tin: {exc}"
+            if job:
+                reason = control.blocked(job["employer"]["name"], job["title"])
+                if reason:
+                    job = None
             if not job:
                 skipped.append({"link": link, "ly_do": reason})
                 continue
@@ -315,8 +319,15 @@ def main(argv=None):
     p.add_argument("--loop-minutes", type=float, default=0, help="Chạy lặp trong bấy nhiêu phút (0 = quét một lần)")
     p.add_argument("--every", type=float, default=5, help="Khoảng cách giữa các lượt quét, phút")
     args = p.parse_args(argv)
+    stop = None if args.dry_run else control.paused("timviecso")
+    if stop:
+        msg = "Đang tạm dừng trên website quản lý (" + ("cả hệ thống" if stop == "all" else "timviecso.vn") + "), không đăng tin."
+        print(json.dumps({"tam_dung": stop, "thong_bao": msg}, ensure_ascii=False))
+        control.report("timviecso-dang", True, msg, skipped=True)
+        return 0
     end = time.monotonic() + args.loop_minutes * 60
     errors = 0
+    posted, failed, last_error = 0, 0, ""
     while True:
         start = time.monotonic()
         try:
@@ -324,11 +335,19 @@ def main(argv=None):
         except Exception as exc:  # một lượt lỗi (mạng, trang đổi) không được dừng cả vòng lặp
             report = {"loi": str(exc), "ket_qua": []}
         errors += sum(r["status"] == "loi" for r in report["ket_qua"]) + ("loi" in report)
+        posted += sum(r["status"] == "da_dang" for r in report["ket_qua"])
+        failed += sum(r["status"] == "loi" for r in report["ket_qua"]) + ("loi" in report)
+        last_error = report.get("loi") or next((r.get("error") for r in report["ket_qua"] if r["status"] == "loi"), last_error)
         print(datetime.now().strftime("%H:%M:%S"), json.dumps(report, ensure_ascii=False), flush=True)
         wait = args.every * 60 - (time.monotonic() - start)
         if time.monotonic() + wait >= end:
             break
         time.sleep(max(0, wait))
+    if not args.dry_run:
+        summary = f"Đăng {posted} tin" + (f", lỗi {failed}: {last_error}" if failed else "")
+        if not posted and not failed:
+            summary = "Không có tin mới đạt yêu cầu"
+        control.report("timviecso-dang", not errors, summary, {"dang_hom_nay": report.get("dang_hom_nay")})
     return 1 if errors else 0
 
 
