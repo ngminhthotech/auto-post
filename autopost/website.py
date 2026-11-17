@@ -160,9 +160,21 @@ def main(argv=None):
             for v in videos():
                 print(f"{v.get('_id')}  {(v.get('createdAt') or '')[:10]}  {v.get('title')}  |  {v.get('url')}")
             return 0
+        from autopost import control
+        stop = None if args.dry_run else control.paused("timviecso")
+        if stop:
+            out = {"ok": True, "skipped": "đang tạm dừng trên website quản lý", "tam_dung": stop}
+            control.report("website-video", True, "Tạm dừng, không thêm video lên timviecso.vn", skipped=True)
+            print(json.dumps(out, ensure_ascii=False))
+            return 0
         out = dang(args.folder, args.date, args.wait, args.dry_run)
+        if not args.dry_run:
+            control.report("website-video", True, out.get("skipped") or f"Đã thêm video: {out.get('title')}")
     except Exception as exc:  # báo lỗi gọn cho routine, không làm hỏng các bước khác
         print(json.dumps({"ok": False, "error": str(exc)[-800:]}, ensure_ascii=False))
+        if args.cmd == "dang" and not args.dry_run:
+            from autopost import control
+            control.report("website-video", False, str(exc)[-300:])
         return 1
     print(json.dumps(out, ensure_ascii=False, indent=1))
     return 0 if out.get("ok") else 1

@@ -10,6 +10,16 @@ Routine chạy không có người ngồi bấm "Cho phép". Lệnh lạ hoặc 
 - Không xóa file bằng `rm`; ghi đè file thì dùng Write.
 - Nếu một lệnh vẫn bị chặn: không thử lách, làm tiếp phần còn lại, cuối cùng báo "⚠️ CẦN XỬ LÝ:" kèm đúng lệnh bị chặn.
 
+## Website quản lý: tạm dừng, danh sách chặn, báo kết quả (từ 17/11/2026)
+
+Chủ dự án tạm dừng đăng và chặn nhà tuyển dụng, từ khóa trên website quản lý (`web-quanly/`). Các lệnh tự làm theo, routine không cần làm gì thêm:
+
+- `autopost.bantin dang` bỏ qua kênh đang tạm dừng (không ghi ket-qua, lần sau bật lại vẫn đăng được); `autopost.careerviet` và `autopost.website dang` không đăng gì khi timviecso.vn tạm dừng; `autopost.careerviet` bỏ tin của nhà tuyển dụng hoặc có từ khóa bị chặn (lý do ghi trong `bo_qua`).
+- Các lệnh `bantin dang`, `website dang`, `careerviet`, `timviecso expired --delete` tự báo kết quả về website (mục "Cảnh báo, lượt chạy"). Lượt nào quá giờ không báo, website tự hiện cảnh báo.
+- Routine bản tin: chạy `python3 -m autopost.control kiem all` trước bước 1. Thoát mã 3 nghĩa là cả hệ thống đang tạm dừng: dừng routine, không dựng video, chạy `python3 -m autopost.control bao bantin --ok "Tạm dừng trên website, không làm bản tin"`.
+- Bước bị lỗi giữa chừng (trước khi tới lệnh đăng): `python3 -m autopost.control bao bantin --loi "<bước>: <lỗi>"`. Báo cáo tuần xong: `python3 -m autopost.control bao bao-cao-tuan --ok "<tên file>"`.
+- Website không với tới được thì các lệnh vẫn chạy như cũ (không dừng, không chặn), chỉ in cảnh báo `[control]`.
+
 ## Routine bản tin video (7:00 mỗi sáng, luồng chuẩn từ 02/11/2026)
 
 
@@ -93,3 +103,7 @@ Tác vụ này đang tắt. Khi bật lại:
 ## Báo cáo hiệu quả hàng tuần (thứ Hai 8:41)
 
 Tác vụ Claude "Báo cáo hiệu quả tuần" chạy `python3 -m autopost.insights --days 7` (số liệu `metrics` của bài trong Buffer: lượt xem, tương tác theo kênh, khung giờ, kiểu bài, top 5 bài), so với tuần trước (`--days 14`), rồi viết đề xuất giờ đăng và kiểu video vào `/mnt/project-files/auto-post/bao-cao/hieu-qua-tuan-<yyyy-mm-dd>.md`. Bài mới đăng dưới 24 giờ chưa đủ số liệu, không dùng để kết luận.
+
+## Bảng điều khiển (12:47 và 21:47, hoặc khi bấm trên trang)
+
+Tác vụ Claude "Auto Post - Bảng điều khiển (cập nhật số liệu, gỡ tin)" chạy `python3 -m autopost.dashboard snapshot`. Khi trang gửi khối "GỠ TIN" (mã tin và lý do) thì chạy `python3 -m autopost.dashboard go <id...> --reason "..."` thay vào đó. Không đăng gì.

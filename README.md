@@ -21,6 +21,9 @@ Dữ liệu và lịch đăng nằm trên Google Drive, thư mục **Auto Post**
 | `render/make_video.sh` | Ghép khung thành video MP4 dọc |
 | `examples/sample-data.json` | Dữ liệu mẫu (7 tin thật ngày 26/10/2026) |
 | `ROUTINE.md` | Hướng dẫn cho routine soạn bài và đăng bài |
+| `autopost/dashboard.py` | Gom số liệu cho bảng điều khiển (`snapshot`) và gỡ tin theo yêu cầu từ bảng điều khiển (`go`) |
+| `dashboard/index.html` | Mã nguồn trang bảng điều khiển riêng trên claude.ai |
+| `web-quanly/` | Website bảng điều khiển riêng trên Cloudflare (đăng nhập, gọi Buffer và timviecso.vn trực tiếp), xem `web-quanly/README.md` |
 
 ## Biến môi trường
 
@@ -46,3 +49,13 @@ python -m autopost.facebook photo --image out/post1_facebook.png --caption-file 
 ```
 
 `--draft` tạo bài ẩn (ảnh) hoặc bản nháp (Reels), không hiện công khai.
+
+## Bảng điều khiển
+
+Trang riêng trên claude.ai (chỉ chủ dự án mở được, đăng nhập bằng tài khoản Claude): https://claude.ai/artifact/8X8Q9SMXaf8TnAnhdmLEEW. Mã nguồn `dashboard/index.html`; sửa xong thì xuất bản lại vào đúng link đó.
+
+- **Tổng quan, Bài đã đăng, Tin timviecso.vn, Nhật ký**: đọc `/mnt/project-files/auto-post/dashboard/snapshot.json` do `python3 -m autopost.dashboard snapshot` ghi.
+- **Lịch chạy**: đọc và đổi giờ, bật/tắt các tác vụ Claude của dự án qua kết nối Claude Code Remote (đổi thật, áp dụng từ lượt kế tiếp).
+- **Duyệt**: đánh dấu tin đã kiểm tra, lưu trong dữ liệu của trang.
+- **Gỡ**: trang gọi tác vụ "Auto Post - Bảng điều khiển (cập nhật số liệu, gỡ tin)" kèm danh sách mã tin; tác vụ chạy `python3 -m autopost.dashboard go <id...> --reason "..."`, ghi `dashboard/nhat-ky-go.json` rồi cập nhật snapshot.
+- Tác vụ đó cũng tự cập nhật số liệu lúc 12:47 và 21:47 mỗi ngày; nút "Cập nhật số liệu" trên trang chạy nó ngay.

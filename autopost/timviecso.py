@@ -193,6 +193,9 @@ def main(argv=None):
                     line = f"LỖI gỡ {line}: {exc}"
             print(line)
         print(f"{len(jobs)} tin quá hạn" + (f", gỡ lỗi {failed}" if failed else ""))
+        if args.delete:
+            from autopost import control
+            control.report("go-het-han", not failed, f"Gỡ {len(jobs) - failed} tin quá hạn" + (f", lỗi {failed}" if failed else ""))
         return 1 if failed else 0
 
     if args.cmd == "list":
